@@ -2,8 +2,7 @@ FROM node:18-bookworm
 
 ARG COMMIT="local-build"
 ARG TAG=""
-ARG UID=10001
-ARG GID=10001
+
 
 LABEL commit=${COMMIT}
 LABEL tag=$TAG
@@ -19,14 +18,8 @@ RUN apt-get update && \
     apt-get update && \
     apt-get install --no-install-recommends -y yarn ffmpeg vim
 
-# Prepare for nonroot user
-RUN groupadd -g $GID app; \
-    useradd -g $GID -u $UID -m -d /code -s /usr/sbin/nologin app
-
-USER app
-
 # Add project source
-COPY --chown=app:app . /code
+COPY . /code
 
 # Setup work directory
 WORKDIR /code

@@ -70,7 +70,7 @@ const BASE_CONFIG: CommonVoiceConfig = {
   MYSQLUSER: configEntry('CV_MYSQLUSER', 'voicecommons'), // For normal DB interactions.
   MYSQLPASS: configEntry('CV_MYSQLPASS', 'voicecommons'),
   MYSQLDBNAME: configEntry('CV_MYSQLDBNAME', 'voiceweb'),
-  MYSQLHOST: configEntry('CV_MYSQLHOST', 'localhost'),
+  MYSQLHOST: configEntry('CV_MYSQLHOST', '127.0.0.1'),
   MYSQLPORT: configEntry('CV_MYSQLPORT', 3306, castInt),
   MYSQLREPLICAHOST: configEntry('CV_MYSQLREPLICAHOST', ''),
   MYSQLREPLICAPORT: configEntry('CV_MYSQLREPLICAPORT', 3306, castInt),
