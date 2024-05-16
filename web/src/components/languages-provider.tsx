@@ -33,7 +33,7 @@ const LanguageRoutes = ({
   children,
 }: LanguageRoutesProps) => {
   const languages = useTypedSelector(({ languages }) => languages);
-
+  
   const [primaryUserLocale] = userLocales;
   const [, toLocaleRoute] = useLocale();
 
@@ -56,32 +56,14 @@ const LanguageRoutes = ({
           const localeParam = something?.match?.params?.locale
 
           const hasTranslatedLocale =
-            languages.translatedLocales.includes(localeParam)
-
+            languages.allLocales.includes(localeParam)
           if (hasTranslatedLocale) {
             if (primaryUserLocale !== localeParam) {
               setUserLocales([localeParam, ...userLocales])
             }
-
             return children
           }
 
-          // redirect pt-BR to pt
-          if (localeParam === 'pt-BR') {
-            return (
-              <Redirect push to={location.pathname.replace('pt-BR', 'pt')} />
-            )
-          }
-
-          // redirect en-UK, en-US etc to en
-          if (localeParam.startsWith('en-')) {
-            return (
-              <Redirect
-                push
-                to={location.pathname.replace(localeParam, 'en')}
-              />
-            )
-          }
 
           // TODO: Find the right place to do this redirect
           if (localeParam === 'sentence-collector') {
@@ -135,16 +117,8 @@ const LanguagesProvider = ({ children }: LanguagesProviderProps) => {
     const localizationUserLocales = [...userLocales];
 
     const pathname = history.location.pathname;
+    setLocale(localizationUserLocales[0]);
 
-    if (!languages.translatedLocales.includes(userLocales[0])) {
-      localizationUserLocales[0] = DEFAULT_LOCALE;
-      setUserLocales(localizationUserLocales);
-
-      setLocale(DEFAULT_LOCALE);
-      history.replace(replacePathLocale(pathname, DEFAULT_LOCALE));
-    } else {
-      setLocale(localizationUserLocales[0]);
-    }
 
     const { documentElement } = document;
     documentElement.setAttribute('lang', localizationUserLocales[0]);

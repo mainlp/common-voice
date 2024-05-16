@@ -15,8 +15,6 @@ import { Avatar, LinkButton } from '../ui/ui';
 import DonateButton from '../donate-button/donate-button';
 import Content from './content';
 import Footer from './footer';
-import LocalizationSelect from '../localization-select/localization-select';
-import LocalizationSelectComplex from '../localization-select/localization-select-complex';
 import Logo from './logo';
 import Nav from './nav/nav';
 import UserMenu from './user-menu';
@@ -259,10 +257,6 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
                   />
                 </Localized>
               )}
-              <LocalizationSelectComplex
-                locale={locale}
-                onLocaleChange={this.handleLocaleChange}
-              />
               <button
                 id="hamburger-menu"
                 className={classNames({
@@ -308,11 +302,6 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
             }
             isContributionPageActive={isContributionPageActive}>
             <div className="user-nav">
-              <LocalizationSelect
-                locale={locale}
-                onLocaleChange={this.handleLocaleChange}
-              />
-
               {user.account && (
                 <div>
                   <LocaleNavLink className="user-nav-link" to={URLS.DASHBOARD}>
