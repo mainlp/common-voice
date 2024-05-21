@@ -20,7 +20,6 @@ import Nav from './nav/nav';
 import UserMenu from './user-menu';
 import cx from 'classnames';
 import WelcomeModal from '../welcome-modal/welcome-modal';
-import NonProductionBanner from './non-production-banner';
 import {
   ChallengeTeamToken,
   challengeTeamTokens,
@@ -285,7 +284,6 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
             />
           )}
         </div>
-        <NonProductionBanner />
         <main
           id="content"
           className={className}
