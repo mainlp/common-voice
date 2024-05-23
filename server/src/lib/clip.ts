@@ -1,4 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
+import * as fs from 'fs';
+import { join } from 'path';
 const PromiseRouter = require('express-promise-router');
 import { getConfig } from '../config-helper';
 import Model from './model';
@@ -12,7 +14,6 @@ import { checkGoalsAfterContribution } from './model/goals';
 import { ChallengeToken, challengeTokens } from 'common';
 import validate from './validation';
 import { clipsSchema } from './validation/clips';
-import { streamUploadToBucket } from '../infrastructure/storage/storage';
 import { pipe } from 'fp-ts/lib/function';
 import { option as O, taskEither as TE, task as T, identity as Id } from 'fp-ts';
 import { Clip as ClientClip } from 'common';
@@ -30,6 +31,8 @@ enum ERRORS {
   CLIP_NOT_FOUND = 'CLIP_NOT_FOUND',
   SENTENCE_NOT_FOUND = 'SENTENCE_NOT_FOUND',
   ALREADY_EXISTS = 'ALREADY_EXISTS',
+  DATABASE_ERROR = 'DATABASE_ERROR',
+  FILE_SAVE_ERROR = 'AUDIO_FILE_NOT_SAVED'
 }
 
 /**
@@ -213,10 +216,10 @@ export default class Clip {
     }
 
     // Where is our audio clip going to be located?
-    const folder = client_id + '/';
     const filePrefix = sentenceId;
-    const clipFileName = folder + filePrefix + '.mp3';
+    const clipFileName = filePrefix + '.mp3';
     const metadata = `${clipFileName} (${size} bytes, ${format}) from ${source}`;
+    const audioDataLocation = join(process.cwd(), '..', process.env.UPLOADS_DIR, clipFileName);
 
     if (await this.model.db.clipExists(client_id, sentenceId)) {
       this.clipSaveError(
@@ -259,59 +262,11 @@ export default class Clip {
           'clip'
         );
         return;
-      })
+      });
+
       pass.on('data', function(chunk: any) {
         chunks.push(chunk);
       });
-      pass.on('finish', async () => {
-        const buffer = Buffer.concat(chunks);
-        const durationInSec = await calcMp3Duration(buffer);
-
-        console.log(`clip written to s3 ${metadata}`);
-
-        await this.model.saveClip({
-          client_id: client_id,
-          localeId: sentence.locale_id,
-          original_sentence_id: sentenceId,
-          path: clipFileName,
-          sentence: sentence.text,
-          duration: durationInSec * 1000,
-        });
-        await Awards.checkProgress(client_id, { id: sentence.locale_id });
-
-        await checkGoalsAfterContribution(client_id, {
-          id: sentence.locale_id,
-        });
-
-        Basket.sync(client_id).catch(e => console.error(e));
-
-        const challenge = headers.challenge as ChallengeToken;
-        const ret = challengeTokens.includes(challenge)
-          ? {
-            filePrefix: filePrefix,
-            showFirstContributionToast: await earnBonus(
-              'first_contribution',
-              [challenge, client_id]
-            ),
-            hasEarnedSessionToast: await hasEarnedBonus(
-              'invite_contribute_same_session',
-              client_id,
-              challenge
-            ),
-            // can't simply reduce the number of the calls to DB through streak_days in checkGoalsAfterContribution()
-            // since the the streak_days may start before the time when user set custom_goals, check to win bonus for each contribution
-            showFirstStreakToast: await earnBonus('three_day_streak', [
-              client_id,
-              client_id,
-              challenge,
-            ]),
-            challengeEnded: await this.model.db.hasChallengeEnded(
-              challenge
-            ),
-          }
-          : { filePrefix };
-        response.json(ret);
-      })
 
       const audioOutput = new Transcoder(audioInput)
         .audioCodec('mp3')
@@ -321,13 +276,82 @@ export default class Clip {
         .stream()
         .pipe(pass);
 
-      await pipe(
-        streamUploadToBucket,
-        Id.ap(getConfig().CLIP_BUCKET_NAME),
-        Id.ap(clipFileName),
-        Id.ap(audioOutput),
-        TE.getOrElse((err: Error) => T.of(console.log(err)))
-      )()
+      const outputWriteStream = fs.createWriteStream(audioDataLocation);
+
+      audioOutput.pipe(outputWriteStream);
+
+      outputWriteStream.on('finish', async () => {
+        try {
+          const buffer = Buffer.concat(chunks);
+          const durationInSec = await calcMp3Duration(buffer);
+
+          await this.model.saveClip({
+            client_id: client_id,
+            localeId: sentence.locale_id,
+            original_sentence_id: sentenceId,
+            path: clipFileName,
+            sentence: sentence.text,
+            duration: durationInSec * 1000,
+          });
+
+          console.log(`clip written to s3 ${metadata}`);
+
+          await Awards.checkProgress(client_id, { id: sentence.locale_id });
+
+          await checkGoalsAfterContribution(client_id, {
+            id: sentence.locale_id,
+          });
+
+          Basket.sync(client_id).catch(e => console.error(e));
+
+          const challenge = headers.challenge as ChallengeToken;
+          const ret = challengeTokens.includes(challenge)
+            ? {
+              filePrefix: filePrefix,
+              showFirstContributionToast: await earnBonus(
+                'first_contribution',
+                [challenge, client_id]
+              ),
+              hasEarnedSessionToast: await hasEarnedBonus(
+                'invite_contribute_same_session',
+                client_id,
+                challenge
+              ),
+              showFirstStreakToast: await earnBonus('three_day_streak', [
+                client_id,
+                client_id,
+                challenge,
+              ]),
+              challengeEnded: await this.model.db.hasChallengeEnded(
+                challenge
+              ),
+            }
+            : { filePrefix };
+          response.json(ret);
+        } catch (err) {
+          console.error('Error saving clip to database:', err);
+          this.clipSaveError(
+            headers,
+            response,
+            500,
+            `Error saving clip to database`,
+            ERRORS.DATABASE_ERROR,
+            'clip'
+          );
+        }
+      });
+
+      outputWriteStream.on('error', (err) => {
+        console.error('Error saving MP3 file:', err);
+        this.clipSaveError(
+          headers,
+          response,
+          500,
+          `Error saving MP3 file: ${err.message}`,
+          ERRORS.FILE_SAVE_ERROR,
+          'clip'
+        );
+      });
     }
   };
 

@@ -20,24 +20,6 @@ services:
     restart: unless-stopped
     networks:
       - voice-web
-  storage:
-    image: fsouza/fake-gcs-server
-    container_name: storage
-    ports:
-      - 8080:8080
-    networks:
-      - voice-web
-    command:
-      [
-        '-scheme',
-        'http',
-        '-port',
-        '8080',
-        '-external-url',
-        'http://storage:8080',
-        '-backend',
-        'filesystem',
-      ]
   bundler:
     build:
       context: ./bundler
@@ -46,7 +28,6 @@ services:
     links:
       - db
       - redis
-      - storage
     volumes:
       - ./bundler:/home/node/code
     networks:
@@ -62,11 +43,12 @@ services:
     links:
       - db
       - redis
-      - storage
     volumes:
       - .:/code
+      - audio_data:/audio_data
     environment:
       - DOTENV_CONFIG_PATH=/code/.env-local-docker
+      - UPLOADS_DIR=/audio_data
     networks:
       - voice-web
     ports:
@@ -74,3 +56,6 @@ services:
     command: bash -c "sed $$'s/\r$$//' /code/docker/wait-for-it.sh > /code/docker/wait-for-it.sh && /code/docker/wait-for-it.sh s3proxy:80 -- /code/docker/prepare_s3.sh && yarn --network-timeout 1000000 && yarn start"
 networks:
   voice-web:
+
+volumes:
+  audio_data:
