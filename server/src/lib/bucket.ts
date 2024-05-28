@@ -87,67 +87,6 @@ export default class Bucket {
     )()
   }
 
-  /**
-   * Grab metadata to play clip on the front end.
-   */
-  async getRandomClips(
-    client_id: string,
-    locale: string,
-    count: number
-  ): Promise<Clip[]> {
-    // Get more clip IDs than are required in case some are broken links or clips
-    const clips = await this.model.findEligibleClips(
-      client_id,
-      locale,
-      Math.ceil(count * 1.5)
-    )
-    const clipPromises: Clip[] = []
-
-    Sentry.captureMessage(
-      `Got ${clips.length} eligible clips for ${locale} locale`,
-      Sentry.Severity.Info
-    )
-
-    // Use for instead of .map so that it can break once enough clips are assembled
-    for (let i = 0; i < clips.length; i++) {
-      const { id, path, sentence, original_sentence_id, taxonomy } = clips[i]
-
-      try {
-        const metadata = await pipe(
-          getMetadataFromFile(getConfig().CLIP_BUCKET_NAME)(path),
-          TE.getOrElse(() => T.of({ size: 0 }))
-        )()
-
-        // if the clip is smaller than 256 bytes it is most likely blank and should be skipped
-        if (metadata.size >= 256) {
-          clipPromises.push({
-            id: id.toString(),
-            glob: path.replace('.mp3', ''),
-            sentence: { id: original_sentence_id, text: sentence, taxonomy },
-            audioSrc: await this.getPublicUrl(path),
-          })
-        } else {
-          console.log(`clip_id ${id} at ${path} is smaller than 256 bytes`)
-          await this.model.db.markInvalid(id.toString())
-        }
-
-        // this will break either when 10 clips have been retrieved or when 15 have been tried
-        // as long as at least 1 clip is returned, the next time the cache refills it will try
-        // for another 15
-        if (clipPromises.length == count) break
-      } catch (e) {
-        console.log(e.message)
-        console.log(`Storage error retrieving clip_id ${id}`)
-        await this.model.db.markInvalid(id.toString())
-      }
-    }
-    Sentry.captureMessage(
-      `Having a total of ${clipPromises.length} clips for ${locale} locale`,
-      Sentry.Severity.Info
-    )
-    return Promise.all(clipPromises)
-  }
-
   takeoutKey(takeout: TakeoutRequest, chunkIndex: number): string {
     return `${takeout.client_id}/takeouts/${takeout.id}/takeout_${takeout.id}_pt_${chunkIndex}.zip`
   }

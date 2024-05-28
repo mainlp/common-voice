@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import * as fs from 'fs';
-import { join } from 'path';
+import { join, resolve } from 'path';
 const PromiseRouter = require('express-promise-router');
 import { getConfig } from '../config-helper';
 import Model from './model';
@@ -25,6 +25,11 @@ const { Converter } = require('ffmpeg-stream');
 const { Readable, PassThrough } = require('stream');
 const mp3Duration = require('mp3-duration');
 const calcMp3Duration = promisify(mp3Duration);
+const MIN_CLIP_DURATION = 1000;
+const MAX_CLIP_DURATION = 15000;
+// Read location is pushed to the frontend which already runs inside /code/web
+const AUDIO_READ_LOCATION =  '/public/audio';
+const AUDIO_WRITE_LOCATION =  '/code/web/public/audio';
 
 enum ERRORS {
   MISSING_PARAM = 'MISSING_PARAM',
@@ -219,7 +224,7 @@ export default class Clip {
     const filePrefix = sentenceId;
     const clipFileName = filePrefix + '.mp3';
     const metadata = `${clipFileName} (${size} bytes, ${format}) from ${source}`;
-    const audioDataLocation = join(process.cwd(), '..', process.env.UPLOADS_DIR, clipFileName);
+    const clipLocation = join(AUDIO_WRITE_LOCATION, clipFileName);
 
     if (await this.model.db.clipExists(client_id, sentenceId)) {
       this.clipSaveError(
@@ -249,7 +254,6 @@ export default class Clip {
       }
 
       const pass = new PassThrough();
-
       let chunks: any = [];
 
       pass.on('error', (error: string) => {
@@ -275,15 +279,17 @@ export default class Clip {
         .sampleRate(32000)
         .stream()
         .pipe(pass);
-
-      const outputWriteStream = fs.createWriteStream(audioDataLocation);
-
+      const outputWriteStream = fs.createWriteStream(clipLocation);
       audioOutput.pipe(outputWriteStream);
 
       outputWriteStream.on('finish', async () => {
         try {
           const buffer = Buffer.concat(chunks);
-          const durationInSec = await calcMp3Duration(buffer);
+          const durationInMs = await calcMp3Duration(buffer) * 1000;
+
+          if (durationInMs < MIN_CLIP_DURATION || durationInMs > MAX_CLIP_DURATION) {
+            throw new Error('Bad clip length: ' + durationInMs);
+          }
 
           await this.model.saveClip({
             client_id: client_id,
@@ -291,7 +297,7 @@ export default class Clip {
             original_sentence_id: sentenceId,
             path: clipFileName,
             sentence: sentence.text,
-            duration: durationInSec * 1000,
+            duration: durationInMs,
           });
 
           console.log(`clip written to s3 ${metadata}`);
@@ -361,14 +367,67 @@ export default class Clip {
   ): Promise<void> => {
     const { client_id, params } = request;
     const count = Number(request.query.count) || 1;
-    const clips = await this.bucket.getRandomClips(
+    const clips = await this.getRandomClips(
       client_id,
       params.locale,
       count
     ).then(this.appendMetadata);
-
     response.json(clips);
   };
+
+  /**
+   * Moved this function from bucket.ts as we host audio clips locally and not on AWS
+   * NOTE: This function won't serve clips that you recorded with the same browser. This is to prevent
+   * users from validating the same clips they recorded. To test in a local environment, you can just
+   * open the webpage in a different browser.
+   */
+  async getRandomClips(
+    client_id: string,
+    locale: string,
+    count: number
+  ): Promise<ClientClip[]> {
+    // Get more clip IDs than are required in case some are broken links or clips
+    const clips = await this.model.findEligibleClips(
+      client_id,
+      locale,
+      Math.ceil(count * 1.5)
+    )
+    const clipPromises: ClientClip[] = []
+
+    Sentry.captureMessage(
+      `Got ${clips.length} eligible clips for ${locale} locale`,
+      Sentry.Severity.Info
+    )
+
+    // Use for instead of .map so that it can break once enough clips are assembled
+    for (let i = 0; i < clips.length; i++) {
+      const { id, path, sentence, original_sentence_id, taxonomy } = clips[i]
+
+      try {
+        clipPromises.push({
+          id: id.toString(),
+          glob: path.replace('.mp3', ''),
+          sentence: { id: original_sentence_id, text: sentence, taxonomy },
+          audioSrc: join(AUDIO_READ_LOCATION,path),
+        })
+      
+        // this will break either when 10 clips have been retrieved or when 15 have been tried
+        // as long as at least 1 clip is returned, the next time the cache refills it will try
+        // for another 15
+        if (clipPromises.length == count) break
+      } catch (e) {
+        console.log(e.message)
+        console.log(`Storage error retrieving clip_id ${id}`)
+        await this.model.db.markInvalid(id.toString())
+      }
+    }
+    Sentry.captureMessage(
+      `Having a total of ${clipPromises.length} clips for ${locale} locale`,
+      Sentry.Severity.Info
+    )
+    console.log(`Having a total of ${clipPromises.length} clips for ${locale} locale`)
+    return Promise.all(clipPromises)
+  }
 
   private appendMetadata = async (clips: ClientClip[]) => {
     const sentenceIds = clips.map(c => c.sentence.id);

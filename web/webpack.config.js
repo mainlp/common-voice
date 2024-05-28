@@ -165,7 +165,7 @@ module.exports = (_env, argv) => {
           }),
         },
         {
-          test: /\.(png|svg|jpg|gif|ttf)$/,
+          test: /\.(png|svg|jpg|gif|ttf|mp3)$/,
           loader: 'file-loader',
           options: {
             esModule: false, // TODO: Switch to ES modules syntax.
