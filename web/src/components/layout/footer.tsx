@@ -1,131 +1,21 @@
 import * as React from 'react';
-import { Localized } from '@fluent/react';
-import { trackNav } from '../../services/tracker';
 import URLS from '../../urls';
-import ShareButtons from '../share-buttons/share-buttons';
-import { ContactIcon, DiscourseIcon, SupportIcon } from '../ui/icons';
-import { TextButton } from '../ui/ui';
-import { LocaleLink, useLocale } from '../locale-helpers';
-import Logo from './logo';
-import SubscribeNewsletter from './subscribe-newsletter';
-import { ContactLink, DiscourseLink, GitHubLink } from '../shared/links';
-
-import './footer.css';
-
-const LocalizedLocaleLink = ({
-  id,
-  to,
-  dataTestId,
-}: {
-  id: string;
-  to: string;
-  dataTestId?: string;
-}) => {
-  const [locale] = useLocale();
-  return (
-    <Localized id={id}>
-      <LocaleLink
-        to={to}
-        onClick={() => trackNav(id, locale)}
-        data-testid={dataTestId}
-      />
-    </Localized>
-  );
-};
 
 const Footer = React.memo(() => {
-  const [locale] = useLocale();
   return (
     <footer>
-      <div id="help-links">
-        <LocaleLink to={URLS.ABOUT} onClick={() => trackNav('about', locale)}>
-          <SupportIcon />
-          <Localized id="about">
-            <div />
-          </Localized>
-        </LocaleLink>
-        <div className="divider" />
-        <DiscourseLink id="discourse">
-          <DiscourseIcon />
-          <div>Discourse</div>
-        </DiscourseLink>
-        <div className="divider" />
-        <ContactLink>
-          <ContactIcon />
-          <Localized id="contact">
-            <div />
-          </Localized>
-        </ContactLink>
-      </div>
-      <div id="moz-links">
-        <div className="logo-container">
-          <Logo isReverse />
-          <p className="license">
-            <Localized
-              id="content-license-text"
-              elems={{
-                licenseLink: (
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="https://www.mozilla.org/en-US/foundation/licensing/website-content/"
-                  />
-                ),
-              }}>
-              <span />
-            </Localized>
+      <div className="tw-w-full tw-bg-darkAccent tw-mx-auto tw-justify-center tw-items-center tw-text-center">
+        <div className="tw-text-whiteText tw-py-12 tw-px-4">
+            Diese Website basiert auf dem <a href='https://commonvoice.mozilla.org/' target="_blank" className="hover:tw-underline tw-font-bold tw-text-whiteText">
+              <span>Mozilla Common Voice</span></a> Projekt
+        </div>
+        <div className="tw-container tw-mx-auto tw-flex tw-flex-col tw-sm:flex-row tw-justify-center tw-items-center tw-py-4 tw-px-5 tw-text-whiteTextLight">
+          <p className="sm:tw-text-left">
+            <a className="tw-text-whiteTextLight hover:tw-underline tw-font-semibold" href={URLS.ABOUT}>Kontakt</a>{' '} | {' '}
+            <a className="tw-text-whiteTextLight hover:tw-underline tw-font-semibold" href={URLS.TERMS}>Nutzungsbedingungen</a>{' '} | {' '}
+            <a className="tw-text-whiteTextLight hover:tw-underline tw-font-semibold" href={URLS.PRIVACY}>Datenschutz</a>
           </p>
         </div>
-        <div className="divider-bottom" />
-        <div className="links">
-          <div>
-            <LocalizedLocaleLink
-              id="privacy"
-              to={URLS.PRIVACY}
-              dataTestId="privacy-link"
-            />
-            <LocalizedLocaleLink
-              id="terms"
-              to={URLS.TERMS}
-              dataTestId="terms-link"
-            />
-            <Localized id="cookies">
-              <a
-                target="_blank"
-                href="https://www.mozilla.org/en-US/privacy/websites/#cookies"
-                rel="noopener noreferrer"
-              />
-            </Localized>
-          </div>
-          <div className="divider-vertical" />
-          <div>
-            <LocalizedLocaleLink id="about" to={URLS.ABOUT} />
-            <GitHubLink>GitHub</GitHubLink>
-          </div>
-        </div>
-
-        <div id="sharing">
-          <Localized id="share-title">
-            <span className="title" />
-          </Localized>
-
-          <div className="icons">
-            <ShareButtons />
-          </div>
-        </div>
-
-        <div id="email-subscription">
-          <SubscribeNewsletter />
-        </div>
-
-        <Localized id="back-top">
-          <TextButton
-            className="back-top"
-            onClick={() => {
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
-          />
-        </Localized>
       </div>
     </footer>
   );
