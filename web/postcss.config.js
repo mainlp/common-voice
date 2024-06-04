@@ -6,5 +6,7 @@ module.exports = {
     'postcss-nested',
     'postcss-custom-media',
     ['cssnano', { preset: ['default', { calc: false }] }],
+    'tailwindcss',
+    'autoprefixer',
   ],
 };

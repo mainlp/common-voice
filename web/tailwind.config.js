@@ -1,8 +1,7 @@
-/** @type {import('tailwindcss').Config} */
+/** @type {import('tailwindcss').Config} ;*/
 
 module.exports = {
-  mode: 'jiit',
-  content: ['./web/src/components/**/*.{js,ts,jsx,tsx,mdx}'],
+  content: ['./src/components/**/*.{js,ts,jsx,tsx,mdx}'],
   darkMode: 'media',
   theme: {
     screens: {
@@ -27,4 +26,4 @@ module.exports = {
   },
   plugins: [
   ],
-};
+}
