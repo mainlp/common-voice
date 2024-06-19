@@ -1,18 +1,16 @@
-import * as React from 'react'
-import { Localized } from '@fluent/react'
+import * as React from 'react';
+import { Localized } from '@fluent/react';
 
-import Page from '../../ui/page'
+import Page from '../../ui/page';
 
-import PageHeading from '../../ui/page-heading'
-import { LinkButton } from '../../ui/ui'
-import { MailIcon } from '../../ui/icons'
-import { COMMON_VOICE_EMAIL } from '../../../constants'
-import { PartnerOptionSection } from './partner-option-section'
-import { PARTNER_OPTIONS } from './partner-options'
-import Subscribe from '../../email-subscribe-block/subscribe'
-import { DonateBanner } from '../../donate-banner'
+import PageHeading from '../../ui/page-heading';
+import { LinkButton } from '../../ui/ui';
+import { MailIcon } from '../../ui/icons';
+import { COMMON_VOICE_EMAIL } from '../../../constants';
+import { PartnerOptionSection } from './partner-option-section';
+import { PARTNER_OPTIONS } from './partner-options';
 
-import './partner.css'
+import './partner.css';
 
 const Partner = () => {
   return (
@@ -107,12 +105,8 @@ const Partner = () => {
           </div>
         </div>
       </section>
-      <section className="donate-banner-section">
-        <DonateBanner />
-      </section>
-      <Subscribe light partnerships subscribeText="about-subscribe-text" />
     </Page>
-  )
-}
+  );
+};
 
-export default Partner
+export default Partner;

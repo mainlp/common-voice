@@ -8,7 +8,6 @@ import HowItWorks from './how-it-works';
 import Playbook from './playbook';
 import GetInvolved from './get-involved';
 import WhyCommonVoice from './why-common-voice';
-import Subscribe from '../../email-subscribe-block/subscribe';
 import useActiveSection from '../../../hooks/use-active-section';
 import Page from '../../ui/page';
 import StateTree from '../../../stores/tree';
@@ -34,7 +33,6 @@ const About: React.FC<PropsFromState> = ({ isSubscribedToMailingList }) => {
           Nav,
         ],
         [SECTIONS.HOW_IT_WORKS, HowItWorks],
-        [SECTIONS.SUBSCRIBE, Subscribe],
         [SECTIONS.PLAYBOOK, Playbook],
         [SECTIONS.GET_INVOLVED, GetInvolved],
       ].map(
