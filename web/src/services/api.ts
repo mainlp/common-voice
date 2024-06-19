@@ -267,6 +267,13 @@ export default class API {
     })
   }
 
+  updateMetadata(data: UserClient): Promise<UserClient> {
+    return this.fetch(API_PATH + '/user_client/update_metadata', {
+      method: 'POST',
+      body: data,
+    })
+  }
+
   saveAnonymousAccountLanguages(data: {
     languages: UserLanguage[]
   }): Promise<UserClient> {

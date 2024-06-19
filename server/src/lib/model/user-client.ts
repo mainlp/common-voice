@@ -605,6 +605,20 @@ const UserClient = {
     return UserClient.findAccount(email);
   },
 
+  async updateMetadata({ client_id, gender, region, ageNum }: UserClientType) {
+    await db.query(
+      `
+      INSERT INTO demographics (client_id, age, gender, region) VALUES (?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        age = VALUES(age),
+        gender = VALUES(gender),
+        region = VALUES(region),
+        updated_at = CURRENT_TIMESTAMP;
+      `,
+      [client_id, ageNum, gender, region]
+    );
+  },
+
   async updateBasketToken(email: string, basketToken: string) {
     const client_id = await this.findClientId(email);
     if (client_id) {

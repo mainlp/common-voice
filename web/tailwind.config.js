@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} ;*/
-
+const colors = require('tailwindcss/colors')
 module.exports = {
   content: ['./src/components/**/*.{js,ts,jsx,tsx,mdx}'],
   darkMode: 'media',
@@ -16,6 +16,7 @@ module.exports = {
         darkAccent: "#0f172a",
         whiteText: "#e2e8f0",
         whiteTextLight: "#637084",
+        primary: colors.blue,
       },
     },
   },

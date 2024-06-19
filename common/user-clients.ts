@@ -6,8 +6,11 @@ export type UserClient = {
   email?: string;
   username?: string;
   client_id?: string;
+  // age is a categorical attribute used for the accounts logic in the existing code. Remove this later
   age?: string;
+  ageNum?: number;
   gender?: string;
+  region?: string;
   languages?: UserLanguage[];
   visible?: 0 | 1 | 2;
   basket_token?: string;

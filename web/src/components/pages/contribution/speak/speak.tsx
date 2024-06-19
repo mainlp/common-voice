@@ -14,7 +14,7 @@ import {
   AbortContributionModalActions,
   AbortContributionModalStatus,
 } from '../../../../stores/abort-contribution-modal';
-import { Sentence as SentenceType } from 'common';
+import { Sentence as SentenceType, UserClient } from 'common';
 import StateTree from '../../../../stores/tree';
 import { Uploads } from '../../../../stores/uploads';
 import { User } from '../../../../stores/user';
@@ -40,6 +40,9 @@ import { SentenceRecording } from './sentence-recording';
 import SpeakErrorContent from './speak-error-content';
 import { USER_LANGUAGES } from './firstSubmissionCTA/firstPostSubmissionCTA';
 import { castTrueString } from '../../../../utility';
+import MetadataModal, {
+  Metadata,
+} from '../../../metadata-modal/metadata-modal';
 
 import './speak.css';
 
@@ -87,10 +90,12 @@ interface State {
   clips: SentenceRecording[];
   isSubmitted: boolean;
   error?: RecordingError | AudioError;
+  metadata?: Metadata;
   recordingStatus: RecordingStatus;
   rerecordIndex?: number;
   showPrivacyModal: boolean;
   showDiscardModal: boolean;
+  showMetadataModal: boolean;
   privacyAgreedChecked?: boolean;
   shouldShowFirstCTA: boolean;
   shouldShowSecondCTA: boolean;
@@ -100,10 +105,12 @@ const initialState: State = {
   clips: [],
   isSubmitted: false,
   error: null,
+  metadata: null,
   recordingStatus: null,
   rerecordIndex: null,
   showPrivacyModal: false,
   showDiscardModal: false,
+  showMetadataModal: true,
   shouldShowFirstCTA: false,
   shouldShowSecondCTA: false,
 };
@@ -197,29 +204,31 @@ class SpeakPage extends React.Component<Props, State> {
   private handleKeyUp = async (event: KeyboardEvent) => {
     let reRecordIndex = null;
     //for both sets of number keys on a keyboard with shift key
-    if (event.code === 'Digit1' || event.code === 'Numpad1') {
-      reRecordIndex = 0;
-    } else if (event.code === 'Digit2' || event.code === 'Numpad2') {
-      reRecordIndex = 1;
-    } else if (event.code === 'Digit3' || event.code === 'Numpad3') {
-      reRecordIndex = 2;
-    } else if (event.code === 'Digit4' || event.code === 'Numpad4') {
-      reRecordIndex = 3;
-    } else if (event.code === 'Digit5' || event.code === 'Numpad5') {
-      reRecordIndex = 4;
-    } else if (event.key === 'Esc' || event.key === 'Escape') {
-      if (this.isRecording) {
-        trackRecording('discard-ongoing', this.props.locale);
-        await this.discardRecording();
+    if (!this.state.showMetadataModal) {
+      if (event.code === 'Digit1' || event.code === 'Numpad1') {
+        reRecordIndex = 0;
+      } else if (event.code === 'Digit2' || event.code === 'Numpad2') {
+        reRecordIndex = 1;
+      } else if (event.code === 'Digit3' || event.code === 'Numpad3') {
+        reRecordIndex = 2;
+      } else if (event.code === 'Digit4' || event.code === 'Numpad4') {
+        reRecordIndex = 3;
+      } else if (event.code === 'Digit5' || event.code === 'Numpad5') {
+        reRecordIndex = 4;
+      } else if (event.key === 'Esc' || event.key === 'Escape') {
+        if (this.isRecording) {
+          trackRecording('discard-ongoing', this.props.locale);
+          await this.discardRecording();
+        }
       }
-    }
 
-    if (reRecordIndex !== null) {
-      trackRecording('rerecord', this.props.locale);
-      await this.discardRecording();
-      this.setState({
-        rerecordIndex: reRecordIndex,
-      });
+      if (reRecordIndex !== null) {
+        trackRecording('rerecord', this.props.locale);
+        await this.discardRecording();
+        this.setState({
+          rerecordIndex: reRecordIndex,
+        });
+      }
     }
   };
 
@@ -497,8 +506,16 @@ class SpeakPage extends React.Component<Props, State> {
     return true;
   };
 
-  private resetState = (callback?: any) =>
-    this.setState(initialState, callback);
+  private resetState = (callback?: any) => {
+    this.setState(
+      prevState => ({
+        ...initialState,
+        // we want to ask users for metadata only once
+        metadata: prevState.metadata,
+      }),
+      callback
+    );
+  };
 
   private agreeToTerms = async () => {
     this.setState({ showPrivacyModal: false });
@@ -580,6 +597,20 @@ class SpeakPage extends React.Component<Props, State> {
     this.setAbortContributionModalVisiblity(false);
   };
 
+  private toggleMetadataModal = () => {
+    this.setState({ showMetadataModal: !this.state.showMetadataModal });
+  };
+
+  private handleMetadataSubmit = (metadata: Metadata) => {
+    const uc: UserClient = {
+      ageNum: metadata.age,
+      gender: metadata.gender,
+      region: metadata.location,
+    };
+    this.props.api.updateMetadata(uc);
+    this.setState({ metadata: metadata });
+  };
+
   render() {
     const { getString, user, isLoading, hasLoadingError } = this.props;
     const {
@@ -600,6 +631,12 @@ class SpeakPage extends React.Component<Props, State> {
     return (
       <>
         <div id="speak-page">
+          {this.state.showMetadataModal && (
+            <MetadataModal
+              onSubmit={this.handleMetadataSubmit}
+              onRequestClose={this.toggleMetadataModal}
+            />
+          )}
           {noNewClips && isLoading && <Spinner delayMs={500} />}
           {!isSubmitted && (
             <NavigationPrompt
@@ -731,6 +768,7 @@ class SpeakPage extends React.Component<Props, State> {
             isFirstSubmit={user.recordTally === 0}
             isPlaying={this.isRecording}
             isSubmitted={isSubmitted}
+            onMetadataButtonClicked={this.toggleMetadataModal}
             onReset={() => this.resetState()}
             onSkip={this.handleSkip}
             onSubmit={this.handleSubmit}

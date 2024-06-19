@@ -76,6 +76,7 @@ export interface ContributionPageProps
   isFirstSubmit?: boolean;
   isPlaying: boolean;
   isSubmitted: boolean;
+  onMetadataButtonClicked?: () => void;
   onReset: () => any;
   onSkip: () => any;
   onSubmit?: (evt?: React.SyntheticEvent) => void;
@@ -336,6 +337,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
       getString,
       instruction,
       isSubmitted,
+      onMetadataButtonClicked,
       onReset,
       onSkip,
       onSubmit,
@@ -527,6 +529,15 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
                 <span />
               </Localized>
             </LinkButton>
+            {type == 'speak' && onMetadataButtonClicked && (
+              <Button
+                rounded
+                outline
+                className="tw-mr-4"
+                onClick={onMetadataButtonClicked}>
+                Metadaten
+              </Button>
+            )}
             <div className="extra-buttons">
               <ReportButton
                 onClick={() => this.setState({ showReportModal: true })}
