@@ -30,9 +30,9 @@ const MIN_AGE = 18;
 const MAX_AGE = 99;
 
 export default function MetadataModal({ onRequestClose, onSubmit }: Props) {
-  const [gender, setGender] = useState(null);
-  const [age, setAge] = useState(null);
-  const [location, setLocation] = useState(null);
+  const [gender, setGender] = useState('');
+  const [age, setAge] = useState(18);
+  const [location, setLocation] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
