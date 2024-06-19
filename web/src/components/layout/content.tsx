@@ -8,14 +8,7 @@ import DocumentPage from '../pages/document-page';
 import { Spinner } from '../ui/ui';
 import { LoginFailure, LoginSuccess } from '../pages/login';
 const HomePage = React.lazy(() => import('../pages/home/home'));
-const DatasetsPage = React.lazy(() => import('../pages/datasets/datasets'));
-const LanguagesPage = React.lazy(() => import('../pages/languages/languages'));
-const LanguagesRequestPage = React.lazy(() => {
-  return import('../pages/languages/request/request');
-});
-const LanguagesRequestSuccessPage = React.lazy(() => {
-  return import('../pages/languages/request/request-success');
-});
+
 const DashboardPage = React.lazy(() => import('../pages/dashboard/dashboard'));
 const ProfileLayoutPage = React.lazy(() => import('../pages/profile/layout'));
 const AboutPage = React.lazy(() => import('../pages/about/about'));
@@ -28,12 +21,12 @@ const GuidelinesPage = React.lazy(
 const SentenceCollectorRedirectPage = React.lazy(
   () =>
     import('../pages/sentence-collector-redirect/sentence-collector-redirect')
-)
+);
 
-const SentryRoute = Sentry.withSentryRouting(Route)
+const SentryRoute = Sentry.withSentryRouting(Route);
 
 export default function Content({ location }: { location: any }) {
-  const [locale, toLocaleRoute] = useLocale()
+  const [locale, toLocaleRoute] = useLocale();
   return (
     <React.Suspense fallback={<Spinner />}>
       <Switch>
@@ -60,28 +53,8 @@ export default function Content({ location }: { location: any }) {
         />
         <SentryRoute
           exact
-          path={toLocaleRoute(URLS.LANGUAGES)}
-          component={LanguagesPage}
-        />
-        <SentryRoute
-          exact
-          path={toLocaleRoute(URLS.LANGUAGE_REQUEST)}
-          component={LanguagesRequestPage}
-        />
-        <SentryRoute
-          exact
-          path={toLocaleRoute(URLS.LANGUAGE_REQUEST_SUCCESS)}
-          component={LanguagesRequestSuccessPage}
-        />
-        <SentryRoute
-          exact
           path={toLocaleRoute(URLS.DATA)}
           render={() => <Redirect to={toLocaleRoute(URLS.DATASETS)} />}
-        />
-        <SentryRoute
-          exact
-          path={toLocaleRoute(URLS.DATASETS)}
-          component={DatasetsPage}
         />
         <SentryRoute
           exact
@@ -175,7 +148,7 @@ export default function Content({ location }: { location: any }) {
           render={() => {
             // note: this is redundant with routing in LocalizedPage in app.tsx, and handles
             // locale changing edge cases where toLocaleRoute is still using the old locale
-            return <Redirect to={toLocaleRoute(URLS.SPEAK)} />
+            return <Redirect to={toLocaleRoute(URLS.SPEAK)} />;
           }}
         />
         <SentryRoute
@@ -184,7 +157,7 @@ export default function Content({ location }: { location: any }) {
           render={() => {
             // note: this is redundant with routing in LocalizedPage in app.tsx, and handles
             // locale changing edge cases where toLocaleRoute is still using the old locale
-            return <Redirect to={toLocaleRoute(URLS.LISTEN)} />
+            return <Redirect to={toLocaleRoute(URLS.LISTEN)} />;
           }}
         />
         <SentryRoute
@@ -218,5 +191,5 @@ export default function Content({ location }: { location: any }) {
         />
       </Switch>
     </React.Suspense>
-  )
+  );
 }

@@ -240,9 +240,6 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
               />
             </div>
             <div>
-              <div className="hidden-sm-down">
-                <DonateButton shouldApplyRightMargin={!user.account} />
-              </div>
               {user.account ? (
                 <UserMenu />
               ) : isBuildingProfile ? null : (
@@ -327,10 +324,6 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
                   <LinkButton rounded href="/login" className="auth-button" />
                 </Localized>
               )}
-
-              <div className="donate-btn-container">
-                <DonateButton />
-              </div>
             </div>
           </Nav>
         </div>
