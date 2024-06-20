@@ -32,7 +32,7 @@ const ErrorPage = ({ children, errorCode, prevPath }: Props) => {
       : `error-title-${errorCode}`;
 
   return (
-    <Page className="error-page">
+    <Page>
       <div className="error-page-wrapper">
         <div className="error-page__content">
           <PageHeading>
@@ -43,42 +43,6 @@ const ErrorPage = ({ children, errorCode, prevPath }: Props) => {
             <h2>
               <Localized id="error-code" vars={{ code: errorCode }} />
             </h2>
-            {children || (
-              <React.Fragment>
-                <Localized
-                  id={`error-content-${errorCode}`}
-                  elems={{
-                    homepageLink: <LocaleLink to="" />,
-                    matrixLink: <MatrixLink />,
-                    githubLink: <GitHubLink />,
-                    discourseLink: <DiscourseLink />,
-                  }}>
-                  <p />
-                </Localized>
-                <div className="error-page__buttons">
-                  <RoundButton>
-                    <DiscourseLink>
-                      <VisuallyHidden>Discourse</VisuallyHidden>
-                      <DiscourseIconCode />
-                    </DiscourseLink>
-                  </RoundButton>
-
-                  <RoundButton>
-                    <GitHubLink>
-                      <VisuallyHidden>GitHub</VisuallyHidden>
-                      <GithubIconCode />
-                    </GitHubLink>
-                  </RoundButton>
-
-                  <RoundButton>
-                    <MatrixLink>
-                      <VisuallyHidden>Matrix</VisuallyHidden>
-                      <MatrixIcon />
-                    </MatrixLink>
-                  </RoundButton>
-                </div>
-              </React.Fragment>
-            )}
           </PageTextContent>
         </div>
         <div className="error-page__image">
