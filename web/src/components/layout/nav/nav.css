@@ -1,8 +1,6 @@
 @import url('../../media.css');
 
 .header-wrapper {
-    border-bottom: 1px solid var(--light-grey);
-
     &.contribution-page-active {
         @media (--xl-up) {
             height: 130px;
@@ -281,7 +279,7 @@ header {
             display: block;
 
             &.active {
-                color: var(--red);
+                color: var(--blue);
             }
         }
 
@@ -512,7 +510,7 @@ header {
             }
 
             &.active {
-                color: var(--red);
+                color: var(--blue);
             }
         }
 

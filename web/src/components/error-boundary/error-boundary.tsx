@@ -1,7 +1,6 @@
 import * as React from 'react';
 
 import URLS from '../../urls';
-import LogoImage from '../ui/logo-image/logo-image';
 import Page from '../ui/page';
 import PageHeading from '../ui/page-heading';
 import PageTextContent from '../ui/page-text-content';
@@ -39,8 +38,6 @@ class ErrorBoundary extends React.Component<Props> {
       return (
         <div className="ErrorBoundary">
           <Page isCentered>
-            <LogoImage />
-
             <PageHeading>Something went wrong</PageHeading>
 
             <PageTextContent>

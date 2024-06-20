@@ -222,10 +222,9 @@ button {
 }
 
 .Logo {
-    @media (--md-up) {
-        margin-inline-end: var(--standard-margin);
-        width: 10rem;
-    }
+
+    margin-inline-end: var(--standard-margin);
+    width: 10rem;
 
     @media (--xl-up) {
         margin-inline-end: 4rem;
@@ -233,11 +232,6 @@ button {
 
     @media (--lg-only) {
         margin-inline-end: 1rem;
-    }
-
-    &,
-    & .LogoImage {
-        height: 100%;
     }
 }
 

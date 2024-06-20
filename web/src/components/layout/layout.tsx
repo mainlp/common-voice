@@ -12,7 +12,6 @@ import { replacePathLocale } from '../../utility';
 import { LocaleNavLink } from '../locale-helpers';
 import { CogIcon, DashboardIcon, MenuIcon } from '../ui/icons';
 import { Avatar, LinkButton } from '../ui/ui';
-import DonateButton from '../donate-button/donate-button';
 import Content from './content';
 import Footer from './footer';
 import Logo from './logo';
