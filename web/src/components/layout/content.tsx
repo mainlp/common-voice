@@ -12,9 +12,7 @@ const HomePage = React.lazy(() => import('../pages/home/home'));
 const DashboardPage = React.lazy(() => import('../pages/dashboard/dashboard'));
 const ProfileLayoutPage = React.lazy(() => import('../pages/profile/layout'));
 const AboutPage = React.lazy(() => import('../pages/about/about'));
-const LandingPage = React.lazy(() => import('../pages/landing/landing'));
 const ErrorPage = React.lazy(() => import('../pages/error-page/error-page'));
-const PartnerPage = React.lazy(() => import('../pages/partner/partner'));
 const GuidelinesPage = React.lazy(
   () => import('../pages/guidelines/guidelines')
 );
@@ -126,11 +124,6 @@ export default function Content({ location }: { location: any }) {
           render={() => <DocumentPage key="c" name="challenge-terms" />}
         />
         <SentryRoute
-          exact
-          path={toLocaleRoute('/landing/sodedif')}
-          component={LandingPage}
-        />
-        <SentryRoute
           path={toLocaleRoute('/404')}
           render={() => (
             <ErrorPage errorCode="404" prevPath={location.state?.prevPath} />
@@ -159,11 +152,6 @@ export default function Content({ location }: { location: any }) {
             // locale changing edge cases where toLocaleRoute is still using the old locale
             return <Redirect to={toLocaleRoute(URLS.LISTEN)} />;
           }}
-        />
-        <SentryRoute
-          exact
-          path={toLocaleRoute(URLS.PARTNER)}
-          component={PartnerPage}
         />
         <SentryRoute
           exact
