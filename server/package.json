@@ -44,6 +44,7 @@
     "request-promise-native": "1.0.9",
     "s3-zip": "3.2.1",
     "stream-transcoder": "0.0.5",
+    "supertokens-node": "^18.0.1",
     "talisman": "^1.1.4",
     "ts-node": "8.10.2"
   },

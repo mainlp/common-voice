@@ -43,6 +43,7 @@ services:
     links:
       - db
       - redis
+      - supertokens
     volumes:
       - .:/code
       - audio_data:/code/web/public/audio
@@ -53,6 +54,24 @@ services:
     ports:
       - 9000:9000
     command: bash -c "sed $$'s/\r$$//' /code/docker/wait-for-it.sh > /code/docker/wait-for-it.sh && /code/docker/wait-for-it.sh s3proxy:80 -- /code/docker/prepare_s3.sh && yarn --network-timeout 1000000 && yarn start"
+  supertokens:
+    container_name: supertokens
+    image: registry.supertokens.io/supertokens/supertokens-mysql:9.0.2
+    ports:
+      - 3567:3567
+    depends_on:
+      - db
+    environment:
+      MYSQL_CONNECTION_URI: mysql://voicecommons:voicecommons@db:3306/voiceweb
+    networks:
+      - voice-web
+    restart: unless-stopped
+    healthcheck:
+      test: >
+        bash -c 'exec 3<>/dev/tcp/127.0.0.1/3567 && echo -e "GET /hello HTTP/1.1\r\nhost: 127.0.0.1:3567\r\nConnection: close\r\n\r\n" >&3 && cat <&3 | grep "Hello"'
+      interval: 10s
+      timeout: 5s
+      retries: 5
 networks:
   voice-web:
 

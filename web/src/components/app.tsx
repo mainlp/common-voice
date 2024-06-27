@@ -2,18 +2,11 @@ import * as React from 'react';
 import * as Modal from 'react-modal';
 import { Suspense } from 'react';
 import { connect, Provider as ReduxProvider } from 'react-redux';
-import {
-  Redirect,
-  Route,
-  RouteComponentProps,
-  Switch,
-  withRouter,
-} from 'react-router';
-import { Router } from 'react-router-dom';
+import { Redirect, RouteComponentProps, withRouter } from 'react-router';
+import { Router, Switch, Route, BrowserRouter, Link } from 'react-router-dom';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import { createBrowserHistory } from 'history';
-
 import { UserClient } from 'common';
 import store from '../stores/root';
 import URLS from '../urls';
@@ -30,11 +23,24 @@ import NotificationPill from './notification-pill/notification-pill';
 import { Spinner } from './ui/ui';
 import { localeConnector, LocalePropsFromState } from './locale-helpers';
 import { Flags } from '../stores/flags';
-
 import LanguagesProvider from './languages-provider';
 import ErrorBoundary from './error-boundary/error-boundary';
 import LocalizedErrorBoundary from './error-boundary/localized-error-boundary';
 import { AB_TESTING_SPLIT_KEY, SPLIT_A, SPLIT_B } from '../constants';
+import { DEFAULT_LOCALE } from '../services/localization';
+
+import SuperTokens, { SuperTokensWrapper } from 'supertokens-auth-react';
+import ThirdParty, {
+  Github,
+  Google,
+  Apple,
+} from 'supertokens-auth-react/recipe/thirdparty';
+import EmailPassword from 'supertokens-auth-react/recipe/emailpassword';
+import Session from 'supertokens-auth-react/recipe/session';
+import { getSuperTokensRoutesForReactRouterDom } from 'supertokens-auth-react/ui';
+import { ThirdPartyPreBuiltUI } from 'supertokens-auth-react/recipe/thirdparty/prebuiltui';
+import { EmailPasswordPreBuiltUI } from 'supertokens-auth-react/recipe/emailpassword/prebuiltui';
+import * as reactRouterDom from 'react-router-dom';
 
 const ListenPage = React.lazy(
   () => import('./pages/contribution/listen/listen')
@@ -42,98 +48,101 @@ const ListenPage = React.lazy(
 const SpeakPage = React.lazy(() => import('./pages/contribution/speak/speak'));
 const WritePage = React.lazy(
   () => import('./pages/contribution/sentence-collector/write/write-container')
-)
+);
 const ReviewPage = React.lazy(
   () => import('./pages/contribution/sentence-collector/review/review')
-)
-const DemoPage = React.lazy(() => import('./layout/demo-layout'))
-
-const SentryRoute = Sentry.withSentryRouting(Route)
-
+);
+const DemoPage = React.lazy(() => import('./layout/demo-layout'));
+const SentryRoute = Sentry.withSentryRouting(Route);
 const SENTRY_DSN_WEB =
-  'https://40742891598c4900aacac78dd1145d7e@o1069899.ingest.sentry.io/6251028'
-
+  'https://40742891598c4900aacac78dd1145d7e@o1069899.ingest.sentry.io/6251028';
+console.log(process.env.API_URL);
 Sentry.init({
   dsn: shouldEmitErrors() ? SENTRY_DSN_WEB : null,
   integrations: [new BrowserTracing()],
   environment: isProduction() ? 'prod' : 'stage',
   release: process.env.GIT_COMMIT_SHA || null,
-})
+});
+SuperTokens.init({
+  appInfo: {
+    appName: 'Bavarian Voice',
+    apiDomain: process.env.API_URL,
+    websiteDomain: process.env.API_URL,
+    apiBasePath: '/auth',
+    websiteBasePath: '/' + DEFAULT_LOCALE + '/login',
+  },
+  recipeList: [
+    ThirdParty.init({
+      signInAndUpFeature: {
+        providers: [Github.init(), Google.init(), Apple.init()],
+      },
+    }),
+    EmailPassword.init(),
+    Session.init(),
+  ],
+});
 
 interface PropsFromState {
-  api: API
-  account: UserClient
-  notifications: Notifications.State
-  uploads: Uploads.State
-  languages: Languages.State
-  messageOverwrites: Flags.MessageOverwrites
+  api: API;
+  account: UserClient;
+  notifications: Notifications.State;
+  uploads: Uploads.State;
+  languages: Languages.State;
+  messageOverwrites: Flags.MessageOverwrites;
 }
-
 interface PropsFromDispatch {
-  addNotification: typeof Notifications.actions.addBanner
-  removeUpload: typeof Uploads.actions.remove
-  setLocale: typeof Locale.actions.set
-  refreshUser: typeof User.actions.refresh
-  updateUser: typeof User.actions.update
+  addNotification: typeof Notifications.actions.addBanner;
+  removeUpload: typeof Uploads.actions.remove;
+  setLocale: typeof Locale.actions.set;
+  refreshUser: typeof User.actions.refresh;
+  updateUser: typeof User.actions.update;
 }
-
 interface LocalizedPagesProps
   extends PropsFromState,
     PropsFromDispatch,
     LocalePropsFromState,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     RouteComponentProps<any, any, any> {}
-
 interface LocalizedPagesState {
-  uploadPercentage?: number
+  uploadPercentage?: number;
 }
-
 let LocalizedPage: any = class extends React.Component<
   LocalizedPagesProps,
   LocalizedPagesState
 > {
-  seenAwardIds: number[] = []
+  seenAwardIds: number[] = [];
   state: LocalizedPagesState = {
     uploadPercentage: null,
-  }
-
+  };
   isUploading = false;
 
   async componentDidMount() {
-    this.props.updateUser({})
-    this.props.refreshUser()
-
+    this.props.updateUser({});
+    this.props.refreshUser();
     if (isMobileSafari()) {
-      document.body.classList.add('mobile-safari')
+      document.body.classList.add('mobile-safari');
     }
-
     if (!localStorage.getItem(AB_TESTING_SPLIT_KEY)) {
-      this.setABSplit()
+      this.setABSplit();
     }
-
-    Modal.setAppElement('#root')
+    Modal.setAppElement('#root');
   }
-
   async UNSAFE_componentWillReceiveProps(nextProps: LocalizedPagesProps) {
-    const { account, addNotification, api, uploads } = nextProps
-
-    this.runUploads(uploads).catch(e => console.error(e))
-
+    const { account, addNotification, api, uploads } = nextProps;
+    this.runUploads(uploads).catch(e => console.error(e));
     window.onbeforeunload =
       uploads.length > 0
         ? (e: any) =>
             (e.returnValue =
               'Leaving the page now aborts pending uploads. Are you sure?')
-        : undefined
-
+        : undefined;
     const award = account?.awards
       ? account.awards.find(
           a => !a.notification_seen_at && !this.seenAwardIds.includes(a.id)
         )
-      : null
-
+      : null;
     if (award) {
-      this.seenAwardIds.push(...account.awards.map(a => a.id))
+      this.seenAwardIds.push(...account.awards.map(a => a.id));
       addNotification(
         `Success, ${award.amount} Clip ${
           award.days_interval == 1 ? 'daily' : 'weekly'
@@ -146,66 +155,57 @@ let LocalizedPage: any = class extends React.Component<
             },
           ],
         }
-      )
-      await api.seenAwards('notification')
+      );
+      await api.seenAwards('notification');
     }
   }
-
   async runUploads(uploads: Uploads.State) {
-    if (this.isUploading) return
-    this.isUploading = true
-    this.setState({ uploadPercentage: 0 })
+    if (this.isUploading) return;
+    this.isUploading = true;
+    this.setState({ uploadPercentage: 0 });
     for (let i = 0; i < uploads.length; i++) {
-      this.setState({ uploadPercentage: (i + 1) / (uploads.length + 1) })
-      const upload = uploads[i]
+      this.setState({ uploadPercentage: (i + 1) / (uploads.length + 1) });
+      const upload = uploads[i];
       try {
-        await upload()
+        await upload();
       } catch (e) {
-        console.error('upload error', e)
+        console.error('upload error', e);
       }
-      this.props.removeUpload(upload)
+      this.props.removeUpload(upload);
     }
-    this.setState({ uploadPercentage: null })
-    this.isUploading = false
-
+    this.setState({ uploadPercentage: null });
+    this.isUploading = false;
     if (this.props.uploads.length > 0) {
-      await this.runUploads(this.props.uploads)
+      await this.runUploads(this.props.uploads);
     }
   }
-
   shouldRedirectToRoot({
     isContributable,
     route,
   }: {
-    isContributable: boolean
-    route: string
+    isContributable: boolean;
+    route: string;
   }) {
     if (isContributable && (route === URLS.SPEAK || route === URLS.LISTEN)) {
-      return false
+      return false;
     } else if (route === URLS.WRITE || route === URLS.REVIEW) {
-      return false
+      return false;
     }
-
-    return true
+    return true;
   }
-
   setABSplit() {
     const randomValue = Math.random();
-
     if (randomValue < 0.5) {
-      localStorage.setItem(AB_TESTING_SPLIT_KEY, SPLIT_A)
+      localStorage.setItem(AB_TESTING_SPLIT_KEY, SPLIT_A);
     } else {
-      localStorage.setItem(AB_TESTING_SPLIT_KEY, SPLIT_B)
+      localStorage.setItem(AB_TESTING_SPLIT_KEY, SPLIT_B);
     }
   }
-
   render() {
     const { locale, notifications, toLocaleRoute, location, languages } =
-      this.props
-    const { uploadPercentage } = this.state
-
-    const isContributable = languages.contributableLocales.includes(locale)
-
+      this.props;
+    const { uploadPercentage } = this.state;
+    const isContributable = languages.contributableLocales.includes(locale);
     return (
       <>
         <div
@@ -240,8 +240,11 @@ let LocalizedPage: any = class extends React.Component<
                 )
             )}
         </div>
-
         <Switch>
+          {getSuperTokensRoutesForReactRouterDom(reactRouterDom, [
+            ThirdPartyPreBuiltUI,
+            EmailPasswordPreBuiltUI,
+          ])}
           {[
             { route: URLS.SPEAK, Component: SpeakPage },
             { route: URLS.LISTEN, Component: ListenPage },
@@ -263,15 +266,14 @@ let LocalizedPage: any = class extends React.Component<
               }
             />
           ))}
+
           {location.pathname.includes(URLS.DEMO) ? <DemoPage /> : <Layout />}
         </Switch>
       </>
-    )
+    );
   }
-}
-
+};
 LocalizedPage.displayName = 'LocalizedPage';
-
 LocalizedPage = withRouter(
   localeConnector(
     connect<PropsFromState, PropsFromDispatch>(
@@ -293,7 +295,6 @@ LocalizedPage = withRouter(
     )(LocalizedPage)
   )
 );
-
 const App = () => {
   const history = createBrowserHistory();
 
@@ -303,9 +304,11 @@ const App = () => {
         <ReduxProvider store={store}>
           <Router history={history}>
             <LanguagesProvider>
-              <LocalizedErrorBoundary>
-                <LocalizedPage />
-              </LocalizedErrorBoundary>
+              <SuperTokensWrapper>
+                <LocalizedErrorBoundary>
+                  <LocalizedPage />
+                </LocalizedErrorBoundary>
+              </SuperTokensWrapper>
             </LanguagesProvider>
           </Router>
         </ReduxProvider>
@@ -313,5 +316,4 @@ const App = () => {
     </Suspense>
   );
 };
-
 export default App;

@@ -33,13 +33,18 @@ const LanguageRoutes = ({
   children,
 }: LanguageRoutesProps) => {
   const languages = useTypedSelector(({ languages }) => languages);
-  
   const [primaryUserLocale] = userLocales;
   const [, toLocaleRoute] = useLocale();
 
   return (
     <Switch>
       {/* if there is no locale, redirect to url with locale */}
+      <Route
+        path="/login*"
+        render={({ location }) => (
+          <Redirect to={`/${primaryUserLocale}${location.pathname}`} />
+        )}
+      />
       {Object.values(URLS).map(url => (
         <SentryRoute
           key={url}
@@ -53,17 +58,16 @@ const LanguageRoutes = ({
       <SentryRoute
         path="/:locale"
         render={something => {
-          const localeParam = something?.match?.params?.locale
+          const localeParam = something?.match?.params?.locale;
 
           const hasTranslatedLocale =
-            languages.allLocales.includes(localeParam)
+            languages.allLocales.includes(localeParam);
           if (hasTranslatedLocale) {
             if (primaryUserLocale !== localeParam) {
-              setUserLocales([localeParam, ...userLocales])
+              setUserLocales([localeParam, ...userLocales]);
             }
-            return children
+            return children;
           }
-
 
           // TODO: Find the right place to do this redirect
           if (localeParam === 'sentence-collector') {
@@ -72,7 +76,7 @@ const LanguageRoutes = ({
                 push
                 to={toLocaleRoute(URLS.SENTENCE_COLLECTOR_REDIRECT)}
               />
-            )
+            );
           }
 
           // 404 for non-translated locales
@@ -84,7 +88,7 @@ const LanguageRoutes = ({
                 state: { prevPath: location.pathname },
               }}
             />
-          )
+          );
         }}
       />
     </Switch>
@@ -118,7 +122,6 @@ const LanguagesProvider = ({ children }: LanguagesProviderProps) => {
 
     const pathname = history.location.pathname;
     setLocale(localizationUserLocales[0]);
-
 
     const { documentElement } = document;
     documentElement.setAttribute('lang', localizationUserLocales[0]);

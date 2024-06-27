@@ -1,6 +1,7 @@
 import * as fs from 'fs';
 import { SESClientConfig } from '@aws-sdk/client-ses';
 import { config } from 'dotenv';
+import { strong } from 'fp-ts';
 
 if (process.env.DOTENV_CONFIG_PATH) {
   const result = config({ path: process.env.DOTENV_CONFIG_PATH });
@@ -13,7 +14,10 @@ if (process.env.DOTENV_CONFIG_PATH) {
 export type CommonVoiceConfig = {
   VERSION: string;
   PROD: boolean;
+  API_BASE_URL: string;
   SERVER_PORT: number;
+  SUPERTOKENS_HOST: string;
+  SUPERTOKENS_PORT: number;
   DB_ROOT_USER: string;
   DB_ROOT_PASS: string;
   MYSQLUSER: string;
@@ -64,7 +68,10 @@ const BASE_CONFIG: CommonVoiceConfig = {
   VERSION: configEntry('CV_VERSION', null), // Migration number (e.g. 20171205171637), null = most recent
   RELEASE_VERSION: configEntry('GIT_COMMIT_SHA', null), // X-Release-Version header
   PROD: configEntry('CV_PROD', true, castBoolean), // Set to true for staging and production.
+  API_BASE_URL: configEntry('CV_API_BASE_URL', '127.0.0.1'),
   SERVER_PORT: configEntry('CV_SERVER_PORT', 9000, castInt),
+  SUPERTOKENS_HOST: configEntry('CV_SUPERTOKENS_HOST', 'http://supertokens'),
+  SUPERTOKENS_PORT: configEntry('CV_SUPERTOKENS_PORT', 3567, castInt),
   DB_ROOT_USER: configEntry('CV_DB_ROOT_USER', 'root'), // For running schema migrations.
   DB_ROOT_PASS: configEntry('CV_DB_ROOT_PASS', ''),
   MYSQLUSER: configEntry('CV_MYSQLUSER', 'voicecommons'), // For normal DB interactions.

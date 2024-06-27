@@ -16,7 +16,6 @@ import API from './lib/api';
 import { redis, useRedis, redlock } from './lib/redis';
 import { APIError, getElapsedSeconds } from './lib/utility';
 import { getConfig } from './config-helper';
-import authRouter from './auth-router';
 import fetchLegalDocument from './fetch-legal-document';
 import { createTaskQueues, TaskQueues } from './lib/takeout';
 import getCSPHeaderValue from './csp-header-value';
@@ -24,13 +23,73 @@ import { ValidationError } from 'express-json-validator-middleware';
 import { setupUpdateValidatedSentencesQueue } from './infrastructure/queues/updateValidatedSentencesQueue';
 import { setupBulkSubmissionQueue } from './infrastructure/queues/bulkSubmissionQueue';
 import { importSentences } from './lib/model/db/import-sentences';
+import supertokens from "supertokens-node";
+import Session from "supertokens-node/recipe/session";
+import Dashboard from "supertokens-node/recipe/dashboard";
+import EmailPassword from"supertokens-node/recipe/emailpassword";
+import ThirdParty from"supertokens-node/recipe/thirdparty";
+import {middleware} from "supertokens-node/framework/express";
+import { errorHandler } from "supertokens-node/framework/express";
 
 const MAINTENANCE_VERSION_KEY = 'maintenance-version';
 const FULL_CLIENT_PATH = path.join(__dirname, '..', '..', 'web');
 const MAINTENANCE_PATH = path.join(__dirname, '..', '..', 'maintenance');
-const { RELEASE_VERSION, ENVIRONMENT, SENTRY_DSN_SERVER, PROD } = getConfig();
+const { API_BASE_URL, SERVER_PORT, SUPERTOKENS_HOST, SUPERTOKENS_PORT, RELEASE_VERSION, ENVIRONMENT, SENTRY_DSN_SERVER, PROD } = getConfig();
 const CSP_HEADER_VALUE = getCSPHeaderValue();
 const SECONDS_IN_A_YEAR = 365 * 24 * 60 * 60;
+
+supertokens.init({
+  framework: "express",
+  supertokens: {
+      connectionURI: SUPERTOKENS_HOST + ":" + SUPERTOKENS_PORT,
+  },
+  appInfo: {
+      appName: "Bavarian Voice",
+      apiDomain: API_BASE_URL + ":" + SERVER_PORT,
+      websiteDomain: API_BASE_URL + ":" + SERVER_PORT,
+      apiBasePath: "/auth",
+      websiteBasePath: "/login"
+  },
+  recipeList: [
+      Dashboard.init(),
+      EmailPassword.init(),
+      Session.init(),
+      ThirdParty.init({
+          signInAndUpFeature: {
+              providers: [{
+                  config: {
+                      thirdPartyId: "google",
+                      clients: [{
+                          clientId: "1060725074195-kmeum4crr01uirfl2op9kd5acmi9jutn.apps.googleusercontent.com",
+                          clientSecret: "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"
+                      }]
+                  }
+              }, {
+                  config: {
+                      thirdPartyId: "github",
+                      clients: [{
+                          clientId: "467101b197249757c71f",
+                          clientSecret: "e97051221f4b6426e8fe8d51486396703012f5bd"
+                      }]
+                  }
+              }, {
+                  config: {
+                      thirdPartyId: "apple",
+                      clients: [{
+                          clientId: "4398792-io.supertokens.example.service",
+                          additionalConfig: {
+                              keyId: "7M48Y4RYDL",
+                              privateKey:
+                                  "-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgu8gXs+XYkqXD6Ala9Sf/iJXzhbwcoG5dMh1OonpdJUmgCgYIKoZIzj0DAQehRANCAASfrvlFbFCYqn3I2zeknYXLwtH30JuOKestDbSfZYxZNMqhF/OzdZFTV0zc5u5s3eN+oCWbnvl0hM+9IW0UlkdA\n-----END PRIVATE KEY-----",
+                              teamId: "YWQCXGJRJL",
+                          }
+                      }]
+                  }
+              }],
+          }
+      }),
+  ]
+});
 
 export default class Server {
   app: express.Application;
@@ -39,17 +98,14 @@ export default class Server {
   api: API;
   taskQueues: TaskQueues;
   isLeader: boolean;
-
   get version() {
     const { ENVIRONMENT, RELEASE_VERSION } = getConfig();
     return ENVIRONMENT + RELEASE_VERSION;
   }
-
   constructor(options?: { bundleCrossLocaleMessages: boolean, setupQueues: boolean }) {
     options = { bundleCrossLocaleMessages: true, setupQueues: true, ...options };
     this.model = new Model();
     this.api = new API(this.model);
-
     useRedis.then(ready => {
       if (ready && options.setupQueues) {
         this.taskQueues = createTaskQueues(this.api.takeout);
@@ -58,11 +114,8 @@ export default class Server {
         setupBulkSubmissionQueue()
       }
     });
-
     this.isLeader = null;
-
     const app = (this.app = express());
-
     Sentry.init({
       // no SENTRY_DSN_SERVER is set in development
       dsn: SENTRY_DSN_SERVER,
@@ -75,13 +128,11 @@ export default class Server {
       environment: PROD ? 'prod' : 'stage',
       release: RELEASE_VERSION,
     });
-
     const staticOptions = {
       setHeaders: (response: express.Response) => {
         // Basic Information
         response.set('X-Release-Version', RELEASE_VERSION);
         response.set('X-Environment', ENVIRONMENT);
-
         // security-centric headers
         response.removeHeader('x-powered-by');
         response.set('X-Production', PROD ? 'On' : 'Off');
@@ -95,23 +146,21 @@ export default class Server {
         );
       },
     };
+  
+    app.use(middleware());
+    
     app.use(express.json());
-
     // Enable Sentry request handler
     app.use(Sentry.Handlers.requestHandler());
     // TracingHandler creates a trace for every incoming request
     app.use(Sentry.Handlers.tracingHandler());
-
     app.use(compression());
     if (PROD) {
       app.use(this.ensureSSL);
     }
-
     if (getConfig().MAINTENANCE_MODE + '' === 'true') {
       this.print('Application starting in maintenance mode');
-
       app.use(express.static(MAINTENANCE_PATH, staticOptions));
-
       app.use(/(.*)/, (_request, response) => {
         response.sendFile('index.html', { root: MAINTENANCE_PATH });
       });
@@ -130,25 +179,19 @@ export default class Server {
         }
       });
 
-      app.use(authRouter);
-
       app.use('/api/v1', this.api.getRouter());
-
       app.use(express.static(FULL_CLIENT_PATH, staticOptions));
-
       if (options.bundleCrossLocaleMessages) {
         this.setupCrossLocaleRoute();
       }
-
       this.setupPrivacyAndTermsRoutes();
-
       app.use(
         /(.*)/,
         express.static(FULL_CLIENT_PATH + '/index.html', staticOptions)
       );
-
       // Enable Sentry error handling
       app.use(Sentry.Handlers.errorHandler());
+      app.use(errorHandler());
       app.use(
         (
           error: any,
@@ -158,14 +201,12 @@ export default class Server {
           _next: NextFunction // this unused parameter must be included for error handling middleware
         ) => {
           console.error(error);
-
           const isValidationError = error instanceof ValidationError;
           if (isValidationError) {
             return response.status(StatusCodes.BAD_REQUEST).json({
               errors: error.validationErrors,
             });
           }
-
           const isAPIError = error instanceof APIError;
           return response
             .status(error?.status || StatusCodes.INTERNAL_SERVER_ERROR)
@@ -176,7 +217,6 @@ export default class Server {
       );
     }
   }
-
   private ensureSSL(
     req: express.Request,
     res: express.Response,
@@ -193,7 +233,6 @@ export default class Server {
       return next();
     }
   }
-
   private setupCrossLocaleRoute() {
     const localesPath = path.join(FULL_CLIENT_PATH, 'locales');
     const crossLocaleMessages = fs
@@ -206,12 +245,10 @@ export default class Server {
         }
         return obj;
       }, {});
-
     this.app.get('/cross-locale-messages.json', (request, response) => {
       response.json(crossLocaleMessages);
     });
   }
-
   private setupPrivacyAndTermsRoutes() {
     this.app.get(
       '/privacy/:locale.html',
@@ -232,7 +269,6 @@ export default class Server {
       }
     );
   }
-
   /**
    * Log application level messages in a common format.
    */
@@ -242,19 +278,16 @@ export default class Server {
     // eslint-disable-next-line prefer-spread
     console.log.apply(console, args);
   }
-
   /**
    * Perform any scheduled maintenance on the data model.
    */
   async performMaintenance(): Promise<void> {
     const start = Date.now();
     this.print('performing Maintenance');
-
     try {
       await this.model.performMaintenance();
       await scrubUserActivity();
       await importLocales();
-
       // We no longer need to import sentences from files since users can now
       // directly add sentences on the CV platform. However, it is still
       // valuable to set up a local development environment.
@@ -264,7 +297,6 @@ export default class Server {
       ) {
         await importSentences(await this.model.db.mysql.createPool());
       }
-
       await importTargetSegments();
       this.print('Maintenance complete');
     } catch (err) {
@@ -273,7 +305,6 @@ export default class Server {
       this.print(`${getElapsedSeconds(start)}s to perform maintenance`);
     }
   }
-
   /**
    * Kill the http server if it's running.
    */
@@ -284,7 +315,6 @@ export default class Server {
     }
     this.model.cleanUp();
   }
-
   /**
    * Boot up the http server.
    */
@@ -295,7 +325,6 @@ export default class Server {
       this.print(`listening at http://localhost:${port}`)
     );
   }
-
   /**
    * Make sure we have a connection to the database.
    */
@@ -306,7 +335,6 @@ export default class Server {
       console.error('could not connect to db', err);
     }
   }
-
   async hasMigrated(): Promise<boolean> {
     this.print('checking migration status');
     const result = await redis.get(MAINTENANCE_VERSION_KEY);
@@ -316,53 +344,42 @@ export default class Server {
     }
     return hasMigrated;
   }
-
   /**
    * Start up everything.
    */
   async run(options?: { doImport: boolean }): Promise<void> {
     options = { doImport: true, ...options };
     this.print('starting');
-
     await this.ensureDatabase();
-
     this.listen();
     const { ENVIRONMENT } = getConfig();
-
     if (!ENVIRONMENT || ENVIRONMENT === 'local') {
       await this.performMaintenance();
       return;
     }
-
     if (await this.hasMigrated()) {
       return;
     }
-
     this.print('acquiring lock');
     const lock = await redlock.lock(
       'common-voice-maintenance-lock',
       1000 * 60 * 60 * 6 /* keep lock for 6 hours */
     );
-
     console.log('lock acquired: ', lock?.resource?.toString());
-
     // we need to check again after the lock was acquired, as another instance
     // might've already migrated in the meantime
     if (await this.hasMigrated()) {
       await lock.unlock();
       return;
     }
-
     try {
       await this.performMaintenance();
       await redis.set(MAINTENANCE_VERSION_KEY, this.version);
     } catch (e) {
       this.print('error during maintenance', e);
     }
-
     await lock.unlock();
   }
-
   /**
    * Reset the database to initial factory settings.
    */
@@ -370,7 +387,6 @@ export default class Server {
     await this.model.db.drop();
     await this.model.ensureDatabaseSetup();
   }
-
   async emptyDatabase() {
     await this.model.db.empty();
   }
