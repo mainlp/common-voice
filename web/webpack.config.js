@@ -94,6 +94,10 @@ module.exports = (_env, argv) => {
     }),
 
     new webpack.DefinePlugin({
+      'process.env.API_URL': JSON.stringify(process.env.API_URL),
+    }),
+
+    new webpack.DefinePlugin({
       'process.env.GIT_COMMIT_SHA': JSON.stringify(process.env.GIT_COMMIT_SHA),
     }),
   ];

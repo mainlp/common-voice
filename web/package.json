@@ -101,11 +101,11 @@
     "webpack-cli": "4.9.2"
   },
   "scripts": {
-    "build": "webpack --mode=production --env.API_URL=http://localhost:9000",
+    "build": "API_URL=http://localhost:9000 webpack --mode=production ",
     "build:audit": "AUDIT=true webpack --mode=production",
     "cypress:open": "cypress open",
     "cy:run": "cypress run",
-    "dev": "webpack --mode=development --watch --env.API_URL=http://localhost:9000",
+    "dev": "API_URL=http://localhost:9000 webpack --mode=development --watch",
     "lint": "yarn lint:js && yarn lint:css",
     "lint:js": "eslint .",
     "lint:css": "stylelint \"src/**/*.css\"",
