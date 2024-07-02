@@ -9,6 +9,7 @@ const Transcoder = require('stream-transcoder');
 
 import { UserClient as UserClientType } from 'common';
 import rateLimiter from './rate-limiter-middleware';
+import { authMiddleware } from '../auth-router';
 import { getConfig } from '../config-helper';
 import Awards from './model/awards';
 import CustomGoal from './model/custom-goal';
@@ -60,7 +61,7 @@ export default class API {
 
   getRouter(): Router {
     const router = PromiseRouter();
-
+    router.use(authMiddleware);
     router.get('/metrics', (request: Request, response: Response) => {
       response.redirect('/');
     });
