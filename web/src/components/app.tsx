@@ -28,17 +28,11 @@ import ErrorBoundary from './error-boundary/error-boundary';
 import LocalizedErrorBoundary from './error-boundary/localized-error-boundary';
 import { AB_TESTING_SPLIT_KEY, SPLIT_A, SPLIT_B } from '../constants';
 import { DEFAULT_LOCALE } from '../services/localization';
-
 import SuperTokens, { SuperTokensWrapper } from 'supertokens-auth-react';
-import ThirdParty, {
-  Github,
-  Google,
-  Apple,
-} from 'supertokens-auth-react/recipe/thirdparty';
+
 import EmailPassword from 'supertokens-auth-react/recipe/emailpassword';
 import Session from 'supertokens-auth-react/recipe/session';
 import { getSuperTokensRoutesForReactRouterDom } from 'supertokens-auth-react/ui';
-import { ThirdPartyPreBuiltUI } from 'supertokens-auth-react/recipe/thirdparty/prebuiltui';
 import { EmailPasswordPreBuiltUI } from 'supertokens-auth-react/recipe/emailpassword/prebuiltui';
 import * as reactRouterDom from 'react-router-dom';
 
@@ -56,7 +50,6 @@ const DemoPage = React.lazy(() => import('./layout/demo-layout'));
 const SentryRoute = Sentry.withSentryRouting(Route);
 const SENTRY_DSN_WEB =
   'https://40742891598c4900aacac78dd1145d7e@o1069899.ingest.sentry.io/6251028';
-console.log(process.env.API_URL);
 Sentry.init({
   dsn: shouldEmitErrors() ? SENTRY_DSN_WEB : null,
   integrations: [new BrowserTracing()],
@@ -71,13 +64,45 @@ SuperTokens.init({
     apiBasePath: '/auth',
     websiteBasePath: '/' + DEFAULT_LOCALE + '/login',
   },
+  getRedirectionURL: async context => {
+    if (context.action === 'SUCCESS' && context.newSessionCreated) {
+      if (context.redirectToPath !== undefined) {
+        // we are navigating back to where the user was before they authenticated
+        return context.redirectToPath;
+      }
+      // TODO: implement different behavior for signup vs signin
+      if (context.createdNewUser) {
+        // user signed up
+        return '/';
+      } else {
+        // user signed in
+        return '/';
+      }
+    }
+    return '/';
+  },
   recipeList: [
-    ThirdParty.init({
-      signInAndUpFeature: {
-        providers: [Github.init(), Google.init(), Apple.init()],
+    EmailPassword.init({
+      onHandleEvent: async context => {
+        if (context.action === 'SUCCESS') {
+          if (
+            context.isNewRecipeUser &&
+            context.user.loginMethods.length === 1
+          ) {
+            // sign up
+            const newUserClient: UserClient = {
+              email: context.user.emails[0],
+            };
+            await store.dispatch(
+              User.actions.saveAccount(newUserClient) as any
+            );
+          } else {
+            // Sign in
+            // do nothing for now
+          }
+        }
       },
     }),
-    EmailPassword.init(),
     Session.init(),
   ],
 });
@@ -242,7 +267,6 @@ let LocalizedPage: any = class extends React.Component<
         </div>
         <Switch>
           {getSuperTokensRoutesForReactRouterDom(reactRouterDom, [
-            ThirdPartyPreBuiltUI,
             EmailPasswordPreBuiltUI,
           ])}
           {[

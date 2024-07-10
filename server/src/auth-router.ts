@@ -1,5 +1,4 @@
 import { parse as parseURL } from 'url';
-import * as passport from 'passport';
 import { NextFunction, Request, Response } from 'express';
 const PromiseRouter = require('express-promise-router');
 import * as session from 'express-session';
@@ -7,6 +6,9 @@ const MySQLStore = require('express-mysql-session')(session);
 import UserClient from './lib/model/user-client';
 import DB from './lib/model/db';
 import { getConfig } from './config-helper';
+import Session from "supertokens-node/recipe/session";
+import supertokens from "supertokens-node";
+
 const {
   MYSQLHOST,
   MYSQLDBNAME,
@@ -36,19 +38,22 @@ router.use(
     saveUninitialized: false,
   })
 );
-router.use(passport.initialize());
-router.use(passport.session());
-passport.serializeUser((user: any, done: Function) => done(null, user));
-passport.deserializeUser((sessionUser: any, done: Function) =>
-  done(null, sessionUser)
-);
 export default router;
 const db = new DB();
 export async function authMiddleware(
   request: Request,
   response: Response,
   next: NextFunction
-) {
+)
+{
+  let session = await Session.getSession(request, response,{ sessionRequired: false });
+  if (session !== undefined) {
+    let userId = session.getUserId();
+    let userInfo = await supertokens.getUser(userId)
+    request.user = {
+      emails: userInfo.emails,
+    };
+  }
   if (request.user) {
     const accountClientId = await UserClient.findClientId(
       request.user.emails[0].value

@@ -14,6 +14,7 @@ import {
   UserIcon,
 } from '../ui/icons';
 import { Avatar, Hr } from '../ui/ui';
+import { signOut } from 'supertokens-auth-react/recipe/session';
 
 import './user-menu.css';
 
@@ -21,6 +22,11 @@ export default function UserMenu() {
   const [locale] = useLocale();
   const account = useAccount();
   const [showMenu, setShowMenu] = useState(false);
+
+  async function onLogout() {
+    await signOut();
+    window.location.href = '/';
+  }
 
   return (
     <div data-testid="user-menu">
@@ -70,13 +76,14 @@ export default function UserMenu() {
                   <Hr />
                 </li>
               ))}
-              <li>
-                <a href="/logout">
+              <li key="/">
+                <LocaleLink to="/" onClick={onLogout}>
                   <LogoutIcon />
                   <Localized id="logout">
                     <span />
                   </Localized>
-                </a>
+                </LocaleLink>
+                <Hr />
               </li>
             </ul>
           </div>

@@ -260,7 +260,7 @@ export default class API {
     return this.fetch(API_PATH + '/user_client')
   }
 
-  saveAccount(data: UserClient): Promise<UserClient> {
+  saveAccount(data: UserClient) {
     return this.fetch(API_PATH + '/user_client', {
       method: 'PATCH',
       body: data,

@@ -427,58 +427,13 @@ const UserClient = {
     // @TOOD: this would be better split out into a few smaller queries than one giant query, surely???
     const [rows] = await db.query(
       `
-        SELECT DISTINCT
-          u.*,
-          accents.id AS accent_id,
-          accents.accent_name,
-          accents.accent_token,
-          v.variant_name,
-          v.variant_token,
-          v.id as variant_id,
-          uv.is_preferred_option,
-          locales.name AS locale,
-          ages.age,
-          genders.gender,
-          (SELECT COUNT(*) FROM clips WHERE u.client_id = clips.client_id) AS clips_count,
-          (SELECT COUNT(*) FROM votes WHERE u.client_id = votes.client_id) AS votes_count,
-          t.team,
-          t.challenge,
-          t.invite,
-          n.basket_token AS basket_token
+        SELECT u.*
         FROM user_clients u
-        LEFT JOIN user_client_newsletter_prefs n ON u.client_id = n.client_id
-        LEFT JOIN user_client_accents user_accents ON u.client_id = user_accents.client_id
-        LEFT JOIN accents ON user_accents.accent_id = accents.id
-        LEFT JOIN locales ON accents.locale_id = locales.id
-        LEFT JOIN user_client_variants uv ON u.client_id = uv.client_id and uv.locale_id = locales.id
-        LEFT JOIN variants v on uv.variant_id = v.id 
-
-
-        -- TODO: This subquery is awkward, but safer until we simplify accent
-        --       grouping.
-        CROSS JOIN
-          (SELECT demographics.age_id, demographics.gender_id
-            FROM user_clients
-            LEFT JOIN demographics ON user_clients.client_id = demographics.client_id
-            WHERE user_clients.email = ?
-              AND user_clients.has_login
-            ORDER BY updated_at DESC
-            LIMIT 1
-          ) AS d
-        LEFT JOIN ages ON d.age_id = ages.id
-        LEFT JOIN genders ON d.gender_id = genders.id
-        LEFT JOIN (
-          SELECT enroll.client_id, enroll.url_token as invite, teams.url_token AS team, challenges.url_token AS challenge
-          FROM enroll
-          LEFT JOIN challenges ON enroll.challenge_id = challenges.id
-          LEFT JOIN teams ON enroll.team_id = teams.id AND challenges.id = teams.challenge_id
-        ) t ON t.client_id = u.client_id
-        WHERE u.email = ? AND has_login
-        GROUP BY u.client_id, user_accents.id
-        ORDER BY user_accents.id ASC
+        WHERE u.email = ? AND u.has_login
       `,
-      [email, email]
+      [email]
     );
+    
 
     const clientId = rows[0] ? rows[0].client_id : null;
     const [custom_goals, awards]: any = clientId
@@ -508,7 +463,6 @@ const UserClient = {
           'clips_count',
           'votes_count'
         ),
-        languages: { ...compileLanguages(client.languages, row) },
         awards,
         custom_goals,
         enrollment: {
@@ -519,7 +473,7 @@ const UserClient = {
       }),
       { languages: [] }
     );
-    return reduceLanguages(user);
+    return user;
   },
   async saveAnonymousAccountLanguages(
     client_id: string,
@@ -538,7 +492,7 @@ const UserClient = {
   async saveAccount(
     email: string,
     { client_id, languages, ...data }: UserClientType
-  ): Promise<UserClientType> {
+  ) {
     const [accountClientId, [clients]] = await Promise.all([
       UserClient.findClientId(email),
       email
@@ -550,7 +504,7 @@ const UserClient = {
     ]);
 
     const clientId = accountClientId || client_id;
-
+    console.log(clientId);
     const clientIds = clients.map((c: any) => c.client_id).concat(client_id);
 
     const userData = await Promise.all(
@@ -602,7 +556,7 @@ const UserClient = {
         data.enrollment.challenge,
       ]);
     }
-    return UserClient.findAccount(email);
+    return true;
   },
 
   async updateMetadata({ client_id, gender, region, ageNum }: UserClientType) {

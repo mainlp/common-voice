@@ -273,17 +273,18 @@ export default class API {
   };
 
   saveAccount = async (request: Request, response: Response) => {
-    const { body, user } = request;
-    if (!user) {
+    const { body } = request;
+    body.client_id = request.client_id;
+    if (!body.email) {
       throw new ClientParameterError();
     }
-    response.json(await UserClient.saveAccount(user.emails[0].value, body));
+    response.json(await UserClient.saveAccount(body.email, body));
   };
 
   getAccount = async ({ user }: Request, response: Response) => {
     let userData = null;
     if (user) {
-      userData = await UserClient.findAccount(user.emails[0].value);
+      userData = await UserClient.findAccount(user.emails[0]);
     }
 
     if (userData !== null && userData.avatar_clip_url !== null) {
