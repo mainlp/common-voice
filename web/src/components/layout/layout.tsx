@@ -294,37 +294,7 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
             shouldExpandNavItems={
               this.state.shouldExpandNavItems || !isContributionPageActive
             }
-            isContributionPageActive={isContributionPageActive}>
-            <div className="user-nav">
-              {user.account && (
-                <div>
-                  <LocaleNavLink className="user-nav-link" to={URLS.DASHBOARD}>
-                    <DashboardIcon />
-                    <Localized id="dashboard">
-                      <span />
-                    </Localized>
-                  </LocaleNavLink>
-                  <LocaleNavLink
-                    className="user-nav-link"
-                    to={URLS.PROFILE_SETTINGS}>
-                    <CogIcon />
-                    <Localized id="settings">
-                      <span />
-                    </Localized>
-                  </LocaleNavLink>
-                </div>
-              )}
-              {user.account ? (
-                <Localized id="logout">
-                  <LinkButton rounded href="/logout" className="auth-button" />
-                </Localized>
-              ) : (
-                <Localized id="login-signup">
-                  <LinkButton rounded href="/login" className="auth-button" />
-                </Localized>
-              )}
-            </div>
-          </Nav>
+            isContributionPageActive={isContributionPageActive}></Nav>
         </div>
       </div>
     );

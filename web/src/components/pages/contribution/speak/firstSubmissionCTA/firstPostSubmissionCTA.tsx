@@ -2,9 +2,6 @@ import * as React from 'react';
 import { Localized, useLocalization } from '@fluent/react';
 import cx from 'classnames';
 
-import InputLanguageVariant from '../../../profile/info/languages/input-language-variant';
-import InputLanguageAccents from '../../../profile/info/languages/input-language-accents/input-language-accents';
-
 import { useAPI } from '../../../../../hooks/store-hooks';
 import { Notifications } from '../../../../../stores/notifications';
 
@@ -92,23 +89,6 @@ export const FirstPostSubmissionCta: React.FC<FirstPostSubmissionCtaProps> = ({
                 'variant-input-visible': isVariantInputVisible,
               })}
               key={locale}>
-              <InputLanguageVariant
-                locale={locale}
-                variantsAll={variantsAll}
-                userLanguages={userLanguages}
-                setUserLanguages={setUserLanguages}
-              />
-
-              <div className="accents-wrapper">
-                <InputLanguageAccents
-                  locale={locale}
-                  accents={accents}
-                  accentsAll={accentsAll}
-                  userLanguages={userLanguages}
-                  setUserLanguages={setUserLanguages}
-                />
-              </div>
-
               <Localized
                 id="first-cta-gender-select-help-text"
                 attrs={{ label: true }}>

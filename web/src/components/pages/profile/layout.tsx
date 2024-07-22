@@ -9,21 +9,11 @@ import { User } from '../../../stores/user';
 import StateTree from '../../../stores/tree';
 import URLS from '../../../urls';
 import { localeConnector, LocalePropsFromState } from '../../locale-helpers';
-import {
-  CameraIcon,
-  CloudIcon,
-  CogIcon,
-  TrashIcon,
-  UserIcon,
-  UserPlusIcon,
-} from '../../ui/icons';
-import AvatarSetup from './avatar-setup/avatar-setup';
+import { TrashIcon, UserIcon, CogIcon, UserPlusIcon } from '../../ui/icons';
 import DeleteProfile from './delete/delete';
 import InfoPage from './info/info';
-import Settings from './settings/settings';
 
 import './layout.css';
-import DownloadProfile from './download/download';
 
 const SentryRoute = Sentry.withSentryRouting(Route);
 
@@ -34,13 +24,9 @@ interface PropsFromState {
 interface Props extends LocalePropsFromState, PropsFromState {}
 
 const Layout = ({ toLocaleRoute, user }: Props) => {
-  const [infoRoute, avatarRoute, prefRoute, deleteRoute, downloadRoute] = [
-    URLS.PROFILE_INFO,
-    URLS.PROFILE_AVATAR,
-    URLS.PROFILE_SETTINGS,
-    URLS.PROFILE_DELETE,
-    URLS.PROFILE_DOWNLOAD,
-  ].map(r => toLocaleRoute(r));
+  const [infoRoute, deleteRoute] = [URLS.PROFILE_INFO, URLS.PROFILE_DELETE].map(
+    r => toLocaleRoute(r)
+  );
   return (
     <div className="profile-layout">
       <div className="profile-nav">
@@ -52,17 +38,10 @@ const Layout = ({ toLocaleRoute, user }: Props) => {
                 ? { icon: <UserIcon />, id: 'profile' }
                 : { icon: <UserPlusIcon />, id: 'build-profile' }),
             },
-            { route: avatarRoute, icon: <CameraIcon />, id: 'avatar' },
-            { route: prefRoute, icon: <CogIcon />, id: 'settings' },
             {
               route: deleteRoute,
               icon: <TrashIcon />,
               id: 'profile-form-delete',
-            },
-            {
-              route: downloadRoute,
-              icon: <CloudIcon />,
-              id: 'download-profile',
             },
           ]
             .slice(0, user.account ? Infinity : 1)
@@ -79,21 +58,18 @@ const Layout = ({ toLocaleRoute, user }: Props) => {
       <div className="content">
         <Switch>
           <SentryRoute exact path={infoRoute} component={InfoPage} />
-          {[
-            { route: avatarRoute, Component: AvatarSetup },
-            { route: prefRoute, Component: Settings },
-            { route: deleteRoute, Component: DeleteProfile },
-            { route: downloadRoute, Component: DownloadProfile },
-          ].map(({ route, Component }) => (
-            <SentryRoute
-              key={route}
-              exact
-              path={route}
-              render={props =>
-                user.account ? <Component /> : <Redirect to={infoRoute} />
-              }
-            />
-          ))}
+          {[{ route: deleteRoute, Component: DeleteProfile }].map(
+            ({ route, Component }) => (
+              <SentryRoute
+                key={route}
+                exact
+                path={route}
+                render={props =>
+                  user.account ? <Component /> : <Redirect to={infoRoute} />
+                }
+              />
+            )
+          )}
           <SentryRoute
             render={() => <Redirect to={toLocaleRoute(URLS.PROFILE_INFO)} />}
           />

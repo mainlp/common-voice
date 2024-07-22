@@ -34,7 +34,6 @@ import {
 import { isEnrolled } from '../../dashboard/challenge/constants';
 import { UserLanguage } from 'common';
 
-import ProfileInfoLanguages from './languages/languages';
 import ExpandableInformation from '../../../expandable-information/expandable-information';
 
 import './info.css';
@@ -272,13 +271,6 @@ function ProfileInfo({
           <div />
         </Localized>
       </ExpandableInformation>
-
-      <ProfileInfoLanguages
-        userLanguages={userLanguages}
-        setUserLanguages={setUserLanguages}
-        areLanguagesLoading={areLanguagesLoading}
-        setAreLanguagesLoading={setAreLanguagesLoading}
-      />
 
       <Hr />
 

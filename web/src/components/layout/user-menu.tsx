@@ -6,13 +6,7 @@ import { useAccount } from '../../hooks/store-hooks';
 import { trackNav } from '../../services/tracker';
 import URLS from '../../urls';
 import { LocaleLink, useLocale } from '../locale-helpers';
-import {
-  ChevronDown,
-  CogIcon,
-  DashboardIcon,
-  LogoutIcon,
-  UserIcon,
-} from '../ui/icons';
+import { ChevronDown, LogoutIcon, UserIcon } from '../ui/icons';
 import { Avatar, Hr } from '../ui/ui';
 import { signOut } from 'supertokens-auth-react/recipe/session';
 
@@ -51,19 +45,9 @@ export default function UserMenu() {
             <ul>
               {[
                 {
-                  route: URLS.DASHBOARD,
-                  icon: <DashboardIcon />,
-                  id: 'dashboard',
-                },
-                {
                   route: URLS.PROFILE_INFO,
                   icon: <UserIcon />,
                   id: 'profile',
-                },
-                {
-                  route: URLS.PROFILE_SETTINGS,
-                  icon: <CogIcon />,
-                  id: 'settings',
                 },
               ].map(({ route, icon, id }) => (
                 <li key={route}>
