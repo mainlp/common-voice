@@ -52,7 +52,10 @@ supertokens.init({
   recipeList: [
       Dashboard.init(),
       EmailPassword.init(),
-      Session.init(),
+      Session.init({
+        // needs to be set to true for https server. Use false for development on localhost
+        cookieSecure: false,
+      }),
   ]
 });
 
