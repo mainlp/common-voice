@@ -1,50 +1,52 @@
-import * as React from 'react'
+import * as React from 'react';
 
-import SentenceCollectionWrapper from '../sentence-collector-wrapper'
-import SingleSubmissionWrite from './single-submission-write/single-submission-write'
-import BulkSubmissionWrite from './bulk-submission-write/bulk-submission-write'
-import SentenceCollectorToggle from '../sentence-colector-toggle'
-import BulkSubmissionSuccess from './bulk-submission-write/bulk-submission-success'
+import SentenceCollectionWrapper from '../sentence-collector-wrapper';
+import SingleSubmissionWrite from './single-submission-write/single-submission-write';
+import BulkSubmissionWrite from './bulk-submission-write/bulk-submission-write';
+import SentenceCollectorToggle from '../sentence-colector-toggle';
+import BulkSubmissionSuccess from './bulk-submission-write/bulk-submission-success';
 
-import { useAccount, useSentences } from '../../../../../hooks/store-hooks'
-import { useLocale } from '../../../../locale-helpers'
-import { useGetVariants } from './single-submission-write/hooks/use-get-variants'
+import { useAccount, useSentences } from '../../../../../hooks/store-hooks';
+import { useLocale } from '../../../../locale-helpers';
+import { useGetVariants } from './single-submission-write/hooks/use-get-variants';
 
-import { trackSingleSubmission } from '../../../../../services/tracker'
+import { trackSingleSubmission } from '../../../../../services/tracker';
 
-import './write-container.css'
+import './write-container.css';
 
-export type WriteSubmissionToggleOptions = 'single' | 'bulk'
+export type WriteSubmissionToggleOptions = 'single' | 'bulk';
 
 const WriteContainer = () => {
   const [activeWriteOption, setActiveWriteOption] =
-    React.useState<WriteSubmissionToggleOptions>('single')
+    React.useState<WriteSubmissionToggleOptions>('single');
 
-  const [locale] = useLocale()
-  const account = useAccount()
-  const sentences = useSentences()
-  const { variants } = useGetVariants()
+  const [locale] = useLocale();
+  const account = useAccount();
+  const sentences = useSentences();
+  const { variants } = useGetVariants();
 
-  const variantTokens = variants ? variants.map(variant => variant.token) : []
+  const variantTokens = variants
+    ? variants.map((variant: { token: any }) => variant.token)
+    : [];
 
   // add all variants option to the list of variants in the dropdown
   const allVariants =
     variants &&
-    ['sentence-variant-select-multiple-variants'].concat(variantTokens)
+    ['sentence-variant-select-multiple-variants'].concat(variantTokens);
 
   const handleToggle = (option: WriteSubmissionToggleOptions) => {
-    trackSingleSubmission('toggle-button-click', locale)
-    setActiveWriteOption(option)
-  }
+    trackSingleSubmission('toggle-button-click', locale);
+    setActiveWriteOption(option);
+  };
 
-  const isUploadDone = sentences[locale]?.bulkUploadStatus === 'done'
+  const isUploadDone = sentences[locale]?.bulkUploadStatus === 'done';
 
   if (isUploadDone) {
     return (
       <div className="write-container">
         <BulkSubmissionSuccess />
       </div>
-    )
+    );
   }
 
   return (
@@ -68,7 +70,7 @@ const WriteContainer = () => {
         )}
       </SentenceCollectionWrapper>
     </div>
-  )
-}
+  );
+};
 
-export default WriteContainer
+export default WriteContainer;

@@ -31,7 +31,6 @@ import { PrimaryButton } from '../../primary-buttons/primary-buttons';
 import ShareModal from '../../share-modal/share-modal';
 import { ReportButton, ReportModal, ReportModalProps } from './report/report';
 import Wave from './wave';
-import { FirstPostSubmissionCta } from './speak/firstSubmissionCTA/firstPostSubmissionCTA';
 import { Notifications } from '../../../stores/notifications';
 
 import { SecondPostSubmissionCTA } from './speak/secondSubmissionCTA/secondSubmissionCTA';
@@ -481,16 +480,6 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
             </div>
           )}
         </div>
-
-        {noUserAccount && shouldShowFirstCTA && (
-          <FirstPostSubmissionCta
-            locale={this.props.locale}
-            onReset={onReset}
-            addNotification={this.props.addNotification}
-            successUploadMessage={getString('thanks-for-voice-toast')}
-            errorUploadMessage={getString('thanks-for-voice-toast-error')}
-          />
-        )}
 
         {noUserAccount && shouldShowSecondCTA && (
           <SecondPostSubmissionCTA onReset={onReset} />

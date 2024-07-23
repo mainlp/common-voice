@@ -38,7 +38,6 @@ import AudioWeb, { AudioError, AudioInfo } from './audio-web';
 import RecordingPill from './recording-pill';
 import { SentenceRecording } from './sentence-recording';
 import SpeakErrorContent from './speak-error-content';
-import { USER_LANGUAGES } from './firstSubmissionCTA/firstPostSubmissionCTA';
 import { castTrueString } from '../../../../utility';
 import MetadataModal, {
   Metadata,
@@ -165,10 +164,6 @@ class SpeakPage extends React.Component<Props, State> {
   componentDidMount() {
     const { loadSentences } = this.props;
     loadSentences();
-
-    if (localStorage.getItem(USER_LANGUAGES)) {
-      localStorage.removeItem(USER_LANGUAGES);
-    }
 
     this.audio = new AudioWeb();
     this.audio.setVolumeCallback(this.updateVolume.bind(this));

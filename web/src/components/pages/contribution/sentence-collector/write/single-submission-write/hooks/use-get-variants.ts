@@ -3,7 +3,10 @@ import { useEffect, useState } from 'react'
 import { useAPI } from '../../../../../../../hooks/store-hooks'
 import { useLocale } from '../../../../../../locale-helpers'
 
-import { VariantsAll } from '../../../../../profile/info/languages/languages'
+import { Variant } from 'common';
+export type VariantsAll = {
+  [locale: string]: Array<Variant>;
+};
 
 export const useGetVariants = () => {
   const [variantsAll, setVariantsAll] = useState<VariantsAll>({})
