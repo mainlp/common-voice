@@ -70,10 +70,9 @@ SuperTokens.init({
         // we are navigating back to where the user was before they authenticated
         return context.redirectToPath;
       }
-      // TODO: implement different behavior for signup vs signin
       if (context.createdNewUser) {
         // user signed up
-        return '/';
+        return '/profile/info';
       } else {
         // user signed in
         return '/';

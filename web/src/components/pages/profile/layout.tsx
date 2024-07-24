@@ -12,6 +12,7 @@ import { localeConnector, LocalePropsFromState } from '../../locale-helpers';
 import { TrashIcon, UserIcon, CogIcon, UserPlusIcon } from '../../ui/icons';
 import DeleteProfile from './delete/delete';
 import InfoPage from './info/info';
+import { SessionAuth } from 'supertokens-auth-react/recipe/session';
 
 import './layout.css';
 
@@ -46,33 +47,41 @@ const Layout = ({ toLocaleRoute, user }: Props) => {
           ]
             .slice(0, user.account ? Infinity : 1)
             .map(({ route, icon, id }) => (
-              <NavLink key={route} to={route}>
-                {icon}
-                <Localized id={id}>
-                  <span className="text" />
-                </Localized>
-              </NavLink>
+              <SessionAuth>
+                <NavLink key={route} to={route}>
+                  {icon}
+                  <Localized id={id}>
+                    <span className="text" />
+                  </Localized>
+                </NavLink>
+              </SessionAuth>
             ))}
         </div>
       </div>
       <div className="content">
         <Switch>
-          <SentryRoute exact path={infoRoute} component={InfoPage} />
+          <SessionAuth>
+            <SentryRoute exact path={infoRoute} component={InfoPage} />
+          </SessionAuth>
           {[{ route: deleteRoute, Component: DeleteProfile }].map(
             ({ route, Component }) => (
-              <SentryRoute
-                key={route}
-                exact
-                path={route}
-                render={props =>
-                  user.account ? <Component /> : <Redirect to={infoRoute} />
-                }
-              />
+              <SessionAuth>
+                <SentryRoute
+                  key={route}
+                  exact
+                  path={route}
+                  render={props =>
+                    user.account ? <Component /> : <Redirect to={infoRoute} />
+                  }
+                />
+              </SessionAuth>
             )
           )}
-          <SentryRoute
-            render={() => <Redirect to={toLocaleRoute(URLS.PROFILE_INFO)} />}
-          />
+          <SessionAuth>
+            <SentryRoute
+              render={() => <Redirect to={toLocaleRoute(URLS.PROFILE_INFO)} />}
+            />
+          </SessionAuth>
         </Switch>
       </div>
     </div>
