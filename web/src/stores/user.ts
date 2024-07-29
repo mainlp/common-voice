@@ -163,11 +163,12 @@ export namespace User {
   };
 
   export function reducer(state = getDefaultState(), action: Action): State {
+    // state.isFetchingAccount
     state = {
       ...state,
       userId:
         state.userId ||
-        (state.isFetchingAccount || state.account ? null : generateGUID()),
+        (state.account ? null : generateGUID()),
     };
     switch (action.type) {
       case ActionType.UPDATE:

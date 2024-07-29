@@ -354,7 +354,7 @@ async function updateDemographics(
 
   await db.query(
     `
-    INSERT INTO demographics (client_id, age_id, gender_id) VALUES (?, ?, ?)
+    INSERT INTO demographics (client_id, age, gender) VALUES (?, ?, ?)
       ON DUPLICATE KEY UPDATE
       updated_at = now()
   `,
@@ -493,6 +493,7 @@ const UserClient = {
     email: string,
     { client_id, languages, ...data }: UserClientType
   ) {
+    console.log("user client in save Account");
     const [accountClientId, [clients]] = await Promise.all([
       UserClient.findClientId(email),
       email
@@ -502,7 +503,7 @@ const UserClient = {
           )
         : [],
     ]);
-
+    console.log(data);
     const clientId = accountClientId || client_id;
     console.log(clientId);
     const clientIds = clients.map((c: any) => c.client_id).concat(client_id);
@@ -523,7 +524,7 @@ const UserClient = {
     );
     // the clientId can't be a placeholder value otherwise it'll
     // treat any ? in the username or email as a placeholder also and the query will break
-    const updateDemographicsPromise = updateDemographics(
+    /*const updateDemographicsPromise = updateDemographics(
       clientId,
       data.age,
       data.gender
@@ -533,7 +534,7 @@ const UserClient = {
       this.claimContributions(clientId, clientIds),
       languages && updateLanguages(clientId, languages),
       languages && updateVariants(clientId, languages),
-    ]);
+    ]);*/
 
     if (
       data?.enrollment &&
@@ -560,6 +561,8 @@ const UserClient = {
   },
 
   async updateMetadata({ client_id, gender, region, ageNum }: UserClientType) {
+    console.log("update metadata called" + gender, region, ageNum);
+
     await db.query(
       `
       INSERT INTO demographics (client_id, age, gender, region) VALUES (?, ?, ?, ?)

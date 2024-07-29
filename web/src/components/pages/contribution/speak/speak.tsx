@@ -17,6 +17,7 @@ import {
 import { Sentence as SentenceType, UserClient } from 'common';
 import StateTree from '../../../../stores/tree';
 import { Uploads } from '../../../../stores/uploads';
+import { Metadata } from '../../../../stores/demographics';
 import { User } from '../../../../stores/user';
 import API from '../../../../services/api';
 import { trackRecording, getTrackClass } from '../../../../services/tracker';
@@ -39,10 +40,7 @@ import RecordingPill from './recording-pill';
 import { SentenceRecording } from './sentence-recording';
 import SpeakErrorContent from './speak-error-content';
 import { castTrueString } from '../../../../utility';
-import MetadataModal, {
-  Metadata,
-} from '../../../metadata-modal/metadata-modal';
-
+import MetadataModal from '../../../metadata-modal/metadata-modal';
 import './speak.css';
 
 const MIN_RECORDING_MS = 1000;
@@ -600,7 +598,7 @@ class SpeakPage extends React.Component<Props, State> {
     const uc: UserClient = {
       ageNum: metadata.age,
       gender: metadata.gender,
-      region: metadata.location,
+      region: metadata.region,
     };
     this.props.api.updateMetadata(uc);
     this.setState({ metadata: metadata });

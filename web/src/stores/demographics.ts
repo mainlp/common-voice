@@ -277,24 +277,24 @@ export const LEGACY_ACCENTS: any = {
   },
 };
 
-export const AGES = {
-  '': '',
-  teens: '< 19',
-  twenties: '19 - 29',
-  thirties: '30 - 39',
-  fourties: '40 - 49',
-  fifties: '50 - 59',
-  sixties: '60 - 69',
-  seventies: '70 - 79',
-  eighties: '80 - 89',
-  nineties: '> 89',
-};
+export const MIN_AGE = 18;
+export const MAX_AGE = 99;
+
+export interface Metadata {
+  gender: string;
+  age: number | '';
+  region: string;
+}
+
+
+export const REGIONS = {
+  region_ob: 'Oberbayern',
+  region_nb: 'Niederbayern',
+  region_op: 'Oberpfalz',
+}
 
 export const GENDERS: Gender = {
-  male_masculine: 'Male/Masculine',
-  female_feminine: 'Female/Feminine',
-  intersex: 'Intersex',
-  transgender: 'Transgender',
-  'non-binary': 'Non-binary',
-  do_not_wish_to_say: "Don't wish to say",
+  male_masculine: 'Männlich',
+  female_feminine: 'Weiblich',
+  divers: "Divers",
 };

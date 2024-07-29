@@ -15,7 +15,7 @@ import {
   useLocalStorageState,
 } from '../../../../hooks/store-hooks';
 import { trackProfile } from '../../../../services/tracker';
-import { AGES, GENDERS } from '../../../../stores/demographics';
+import { REGIONS, GENDERS } from '../../../../stores/demographics';
 import { Notifications } from '../../../../stores/notifications';
 import { useTypedSelector } from '../../../../stores/tree';
 import { Uploads } from '../../../../stores/uploads';
@@ -54,14 +54,14 @@ function ProfileInfo({
   const [userFields, setUserFields] = useState<{
     username: string;
     visible: number | string;
-    age: string;
+    age: number;
     gender: string;
     sendEmails: boolean;
     privacyAgreed: boolean;
   }>({
     username: '',
     visible: 0,
-    age: '',
+    age: 18,
     gender: '',
     sendEmails: false,
     privacyAgreed: false,
@@ -95,11 +95,11 @@ function ProfileInfo({
       ...userFields,
       sendEmails: !!account?.basket_token,
       visible: 0,
-      ...pick(user, 'age', 'username', 'gender'),
+      ...pick(user, 'ageNum', 'username', 'gender'),
       ...(account
-        ? pick(account, 'age', 'username', 'gender', 'visible')
+        ? pick(account, 'ageNum', 'username', 'gender', 'visible')
         : {
-            age: userClients.reduce((init, u) => u.age || init, ''),
+            ageNum: userClients.reduce((init, u) => u.age || init, 18),
             gender: userClients.reduce((init, u) => u.gender || init, ''),
           }),
       privacyAgreed: Boolean(account) || user.privacyAgreed,
@@ -146,10 +146,11 @@ function ProfileInfo({
     setTermsStatus('agreed');
 
     const data = {
-      ...pick(userFields, 'username', 'age', 'gender'),
+      ...pick(userFields, 'username', 'gender'),
       languages: userLanguages.filter(l => l.locale),
       visible: JSON.parse(visible.toString()),
       client_id: user.userId,
+      ageNum: age,
       enrollment: user.userClients[0].enrollment || {
         team: null,
         challenge: null,
@@ -190,16 +191,6 @@ function ProfileInfo({
         <h1 />
       </Localized>
 
-      {termsStatus === 'show' && (
-        <TermsModal onAgree={submit} onDisagree={() => setTermsStatus(null)} />
-      )}
-
-      {!user.account && (
-        <Localized id="thanks-for-account">
-          <p />
-        </Localized>
-      )}
-
       <Localized id="why-profile-text">
         <p />
       </Localized>
@@ -219,132 +210,61 @@ function ProfileInfo({
           />
         </Localized>
 
-        <Localized id="leaderboard-visibility" attrs={{ label: true }}>
-          <LabeledSelect
-            value={visible.toString()}
-            onChange={handleChangeFor('visible')}
-            name="leaderboard visibility">
-            <Localized id="hidden">
-              <option value={0} />
-            </Localized>
-            <Localized id="visible">
-              <option value={1} />
-            </Localized>
-            {isEnrolledInChallenge && (
-              <option value={2}>Visible within challenge team</option>
-            )}
-          </LabeledSelect>
-        </Localized>
-
-        <Localized id="profile-form-age" attrs={{ label: true }}>
-          <LabeledSelect
-            value={age}
-            onChange={handleChangeFor('age')}
-            name="age">
-            <Options>{AGES}</Options>
-          </LabeledSelect>
-        </Localized>
+        <LabeledSelect
+          value={age}
+          label="Region"
+          onChange={handleChangeFor('age')}
+          name="region"
+          required>
+          <Options>{REGIONS}</Options>
+        </LabeledSelect>
 
         <Localized id="profile-form-gender-2" attrs={{ label: true }}>
           <LabeledSelect
             value={gender}
             onChange={handleChangeFor('gender')}
-            name="gender">
+            name="gender"
+            required>
             <Options>{GENDERS}</Options>
           </LabeledSelect>
         </Localized>
+
+        <LabeledInput
+          name="age"
+          type="number"
+          label="Alter"
+          min={12}
+          max={66}
+          value={age}
+          onChange={handleChangeFor('age')}
+          required
+        />
       </div>
 
-      <ExpandableInformation summaryLocalizedId="help-sex-or-gender-changes">
-        <Localized
-          id="help-sex-or-gender-changes-explanation"
-          elems={{
-            learnMoreLink: (
-              <a
-                href="https://foundation.mozilla.org/en/blog/expanding-gender-options-on-common-voice/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link"
-              />
-            ),
-          }}>
-          <div />
-        </Localized>
-      </ExpandableInformation>
+      <div className="signup-section">
+        <div className="checkboxes">
+          <LabeledCheckbox
+            label={
+              <>
+                <Localized id="email-opt-in-info-title">
+                  <strong />
+                </Localized>
+                <Localized id="email-opt-in-info-sub-with-challenge">
+                  <span />
+                </Localized>
+              </>
+            }
+            onChange={handleChangeFor('sendEmails')}
+            checked={sendEmails}
+            name="email-opt-in"
+          />
+        </div>
+      </div>
 
       <Hr />
 
-      {!user.account?.basket_token && (
-        <>
-          <div className="signup-section">
-            <Tooltip
-              arrow
-              html={<>{getString('change-email-setings')}</>}
-              theme="dark">
-              <Localized id="email-input" attrs={{ label: true }}>
-                <LabeledInput value={user.userClients[0]?.email} disabled />
-              </Localized>
-            </Tooltip>
-
-            <div className="checkboxes">
-              <LabeledCheckbox
-                label={
-                  <>
-                    <Localized id="email-opt-in-info-title">
-                      <strong />
-                    </Localized>
-                    <Localized id="email-opt-in-info-sub-with-challenge">
-                      <span />
-                    </Localized>
-                  </>
-                }
-                onChange={handleChangeFor('sendEmails')}
-                checked={sendEmails}
-                name="email-opt-in"
-              />
-
-              <LabeledCheckbox
-                {...(user.account || isSubmitted ? { disabled: true } : {})}
-                label={
-                  <>
-                    <Localized id="accept-privacy-title">
-                      <strong />
-                    </Localized>
-                    <Localized
-                      id="accept-privacy"
-                      elems={{
-                        privacyLink: <LocaleLink to={URLS.PRIVACY} blank />,
-                      }}>
-                      <span />
-                    </Localized>
-                  </>
-                }
-                checked={privacyAgreed}
-                onChange={handleChangeFor('privacyAgreed')}
-                name="privacy"
-              />
-
-              <Localized id="read-terms-q">
-                <LocaleLink
-                  to={isEnrolledInChallenge ? URLS.CHALLENGE_TERMS : URLS.TERMS}
-                  className="terms"
-                  blank
-                />
-              </Localized>
-            </div>
-          </div>
-
-          <Hr />
-        </>
-      )}
-
       <Localized id="profile-form-submit-save">
-        <Button
-          className="save"
-          rounded
-          disabled={isSaving || !privacyAgreed || areLanguagesLoading}
-          onClick={submit}
-        />
+        <Button className="save" rounded disabled={isSaving} onClick={submit} />
       </Localized>
     </div>
   );

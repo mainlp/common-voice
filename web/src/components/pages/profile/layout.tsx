@@ -47,7 +47,7 @@ const Layout = ({ toLocaleRoute, user }: Props) => {
           ]
             .slice(0, user.account ? Infinity : 1)
             .map(({ route, icon, id }) => (
-              <SessionAuth>
+              <SessionAuth key={route}>
                 <NavLink key={route} to={route}>
                   {icon}
                   <Localized id={id}>
@@ -60,28 +60,22 @@ const Layout = ({ toLocaleRoute, user }: Props) => {
       </div>
       <div className="content">
         <Switch>
-          <SessionAuth>
-            <SentryRoute exact path={infoRoute} component={InfoPage} />
-          </SessionAuth>
+          <SentryRoute exact path={infoRoute} component={InfoPage} />
           {[{ route: deleteRoute, Component: DeleteProfile }].map(
             ({ route, Component }) => (
-              <SessionAuth>
-                <SentryRoute
-                  key={route}
-                  exact
-                  path={route}
-                  render={props =>
-                    user.account ? <Component /> : <Redirect to={infoRoute} />
-                  }
-                />
-              </SessionAuth>
+              <SentryRoute
+                key={route}
+                exact
+                path={route}
+                render={props =>
+                  user.account ? <Component /> : <Redirect to={infoRoute} />
+                }
+              />
             )
           )}
-          <SessionAuth>
-            <SentryRoute
-              render={() => <Redirect to={toLocaleRoute(URLS.PROFILE_INFO)} />}
-            />
-          </SessionAuth>
+          <SentryRoute
+            render={() => <Redirect to={toLocaleRoute(URLS.PROFILE_INFO)} />}
+          />
         </Switch>
       </div>
     </div>

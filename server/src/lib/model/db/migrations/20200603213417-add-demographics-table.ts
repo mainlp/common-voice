@@ -52,14 +52,7 @@ export const up = async function (db: any): Promise<any> {
          least) maintain an "Other" option.
       */
       INSERT INTO genders (gender) VALUES ('female'), ('male'), ('other');
-      INSERT INTO demographics (client_id, age_id, gender_id)  (
-        SELECT user_clients.client_id, ages.id, genders.id
-        FROM user_clients
-        LEFT JOIN ages ON ages.age = TRIM(LOWER(user_clients.deprecated_age))
-        LEFT JOIN genders ON genders.gender = TRIM(LOWER(user_clients.deprecated_gender))
-        WHERE ages.age IS NOT NULL
-           OR genders.gender IS NOT NULL
-      );
+
       INSERT INTO clip_demographics (clip_id, demographic_id)  (
         SELECT clips.id AS clip_id, demographics.id AS demographic_id
         FROM clips

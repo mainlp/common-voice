@@ -262,19 +262,16 @@ export const Toggle = ({
   </div>
 );
 
-export const Options = withLocalization(
-  ({
-    children,
-    getString,
-  }: {
-    children: { [key: string]: string };
-  } & WithLocalizationProps) => (
-    <>
-      {Object.entries(children).map(([key, value]) => (
-        <option key={key} value={key}>
-          {getString(key, null, value)}
-        </option>
-      ))}
-    </>
-  )
+export const Options = ({
+  children,
+}: {
+  children: { [key: string]: string };
+}) => (
+  <>
+    {Object.entries(children).map(([key, value]) => (
+      <option key={key} value={key}>
+        {value}
+      </option>
+    ))}
+  </>
 );
