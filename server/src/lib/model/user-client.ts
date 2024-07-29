@@ -503,7 +503,6 @@ const UserClient = {
           )
         : [],
     ]);
-    console.log(data);
     const clientId = accountClientId || client_id;
     console.log(clientId);
     const clientIds = clients.map((c: any) => c.client_id).concat(client_id);

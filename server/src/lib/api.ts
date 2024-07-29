@@ -287,12 +287,6 @@ export default class API {
       userData = await UserClient.findAccount(user.emails[0]);
     }
 
-    if (userData !== null && userData.avatar_clip_url !== null) {
-      userData.avatar_clip_url = await this.bucket.getAvatarClipsUrl(
-        userData.avatar_clip_url
-      );
-    }
-
     response.json(user ? userData : null);
   };
 

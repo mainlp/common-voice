@@ -9,6 +9,8 @@ import { LocaleLink, useLocale } from '../locale-helpers';
 import { ChevronDown, LogoutIcon, UserIcon } from '../ui/icons';
 import { Avatar, Hr } from '../ui/ui';
 import { signOut } from 'supertokens-auth-react/recipe/session';
+import { User } from '../../stores/user';
+import { useDispatch } from 'react-redux';
 
 import './user-menu.css';
 
@@ -16,9 +18,11 @@ export default function UserMenu() {
   const [locale] = useLocale();
   const account = useAccount();
   const [showMenu, setShowMenu] = useState(false);
+  const dispatch = useDispatch();
 
   async function onLogout() {
     await signOut();
+    dispatch(User.actions.reset());
     window.location.href = '/';
   }
 

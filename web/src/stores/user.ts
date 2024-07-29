@@ -81,6 +81,15 @@ export namespace User {
       type: ActionType.TALLY_VERIFICATION,
     }),
 
+    reset: 
+    () => 
+    async (dispatch: Dispatch<UpdateAction>) =>{
+      dispatch({
+        type: ActionType.UPDATE,
+        state: getDefaultState(),
+      });
+    },
+
     refresh:
       () =>
       async (dispatch: Dispatch<UpdateAction>, getState: () => StateTree) => {
@@ -163,12 +172,11 @@ export namespace User {
   };
 
   export function reducer(state = getDefaultState(), action: Action): State {
-    // state.isFetchingAccount
     state = {
       ...state,
       userId:
         state.userId ||
-        (state.account ? null : generateGUID()),
+        (state.isFetchingAccount || state.account ? null : generateGUID()),
     };
     switch (action.type) {
       case ActionType.UPDATE:
