@@ -16,7 +16,7 @@ export const up = async function (db: any): Promise<any> {
         age TINYINT UNSIGNED NOT NULL,
         age_id BIGINT(20) UNSIGNED,
         gender_id BIGINT(20) UNSIGNED,
-        gender CHAR(1),
+        gender VARCHAR(30),
         region VARCHAR(30),
         updated_at DATETIME DEFAULT now(),
         FOREIGN KEY (client_id) REFERENCES user_clients (client_id),

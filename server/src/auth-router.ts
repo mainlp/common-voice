@@ -56,7 +56,7 @@ export async function authMiddleware(
   }
   if (request.user) {
     const accountClientId = await UserClient.findClientId(
-      request.user.emails[0].value
+      request.user.emails[0]
     );
     if (accountClientId) {
       request.client_id = accountClientId;

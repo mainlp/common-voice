@@ -290,9 +290,8 @@ export default class API {
     response.json(user ? userData : null);
   };
 
-  updateMetadata = async ({ client_id, body }: Request, response: Response) => {
-    body.client_id = client_id;
-    response.json(await UserClient.updateMetadata(body));
+  updateMetadata = async (request: Request, response: Response) => {
+    response.json(await UserClient.updateMetadata(request.body, request.client_id));
   };
 
   subscribeToNewsletter = async (

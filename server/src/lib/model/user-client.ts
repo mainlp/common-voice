@@ -504,7 +504,6 @@ const UserClient = {
         : [],
     ]);
     const clientId = accountClientId || client_id;
-    console.log(clientId);
     const clientIds = clients.map((c: any) => c.client_id).concat(client_id);
 
     const userData = await Promise.all(
@@ -556,11 +555,10 @@ const UserClient = {
         data.enrollment.challenge,
       ]);
     }
-    return true;
+    return clientId;
   },
 
-  async updateMetadata({ client_id, gender, region, ageNum }: UserClientType) {
-    console.log("update metadata called" + gender, region, ageNum);
+  async updateMetadata({ gender, region, ageNum }: UserClientType, client_id: string) {
 
     await db.query(
       `
@@ -573,6 +571,8 @@ const UserClient = {
       `,
       [client_id, ageNum, gender, region]
     );
+
+    return client_id;
   },
 
   async updateBasketToken(email: string, basketToken: string) {

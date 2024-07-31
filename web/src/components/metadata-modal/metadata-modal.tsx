@@ -21,14 +21,12 @@ export default function MetadataModal({ onRequestClose, onSubmit }: Props) {
   const [region, setRegion] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
-    console.log(gender);
     e.preventDefault();
     const metadata: Metadata = {
       gender,
       age: age === '' ? '' : parseInt(age, 10),
       region,
     };
-    console.log(metadata);
     onSubmit(metadata);
     onRequestClose();
   };
