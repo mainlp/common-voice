@@ -518,7 +518,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
                 <span />
               </Localized>
             </LinkButton>
-            {type == 'speak' && onMetadataButtonClicked && (
+            {noUserAccount && type == 'speak' && onMetadataButtonClicked && (
               <Button
                 rounded
                 outline
