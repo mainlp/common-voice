@@ -267,6 +267,12 @@ export default class API {
     })
   }
 
+  getMetadata(): Promise<UserClient[]> {
+    return this.fetch(API_PATH + '/user_client/get_metadata', {
+      method: 'GET',
+    })
+  }
+
   updateMetadata(data: UserClient): Promise<UserClient> {
     return this.fetch(API_PATH + '/user_client/update_metadata', {
       method: 'POST',

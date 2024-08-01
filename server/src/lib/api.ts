@@ -81,6 +81,7 @@ export default class API {
       bodyParser.raw({ type: 'image/*', limit: '300kb' }),
       this.saveAvatar
     );
+    router.get('/user_client/get_metadata', this.getMetadata);
     router.post('/user_client/update_metadata', this.updateMetadata);
     router.post('/user_client/avatar_clip', this.saveAvatarClip);
     router.get('/user_client/avatar_clip', this.getAvatarClip);
@@ -288,6 +289,10 @@ export default class API {
     }
 
     response.json(user ? userData : null);
+  };
+
+  getMetadata = async (request: Request, response: Response) => {
+    response.json(await UserClient.getMetadataForClient(request.client_id));
   };
 
   updateMetadata = async (request: Request, response: Response) => {

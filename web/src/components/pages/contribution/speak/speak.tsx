@@ -107,7 +107,7 @@ const initialState: State = {
   rerecordIndex: null,
   showPrivacyModal: false,
   showDiscardModal: false,
-  showMetadataModal: true,
+  showMetadataModal: false,
   shouldShowFirstCTA: false,
   shouldShowSecondCTA: false,
 };
@@ -159,7 +159,7 @@ class SpeakPage extends React.Component<Props, State> {
     return null;
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { loadSentences } = this.props;
     loadSentences();
 
@@ -169,6 +169,9 @@ class SpeakPage extends React.Component<Props, State> {
     document.addEventListener('visibilitychange', this.releaseMicrophone);
     document.addEventListener('keyup', this.handleKeyUp);
 
+    // only show the metadata modal if we do not have metadata recorded for this client id
+    const client_ids = await this.props.api.getMetadata();
+    this.setState({ showMetadataModal: client_ids.length == 0 });
     if (
       !this.audio.isMicrophoneSupported() ||
       !this.audio.isAudioRecordingSupported()

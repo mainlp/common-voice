@@ -558,6 +558,17 @@ const UserClient = {
     return clientId;
   },
 
+  async getMetadataForClient(clientId: string){
+    const [rows] = await db.query(
+      `
+      SELECT * FROM demographics
+      WHERE client_id = ?
+    `, [clientId]
+    );
+  
+    return rows
+  },
+  
   async updateMetadata({ gender, region, ageNum }: UserClientType, client_id: string) {
 
     await db.query(
