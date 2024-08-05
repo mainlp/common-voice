@@ -282,7 +282,7 @@ let LocalizedPage: any = class extends React.Component<
                 this.shouldRedirectToRoot({ isContributable, route }) ? (
                   <Redirect to={toLocaleRoute(URLS.ROOT)} />
                 ) : (
-                  <Layout shouldHideFooter>
+                  <Layout>
                     <Component {...props} />
                   </Layout>
                 )

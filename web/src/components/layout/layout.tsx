@@ -10,7 +10,7 @@ import { Locale } from '../../stores/locale';
 import URLS from '../../urls';
 import { replacePathLocale } from '../../utility';
 import { LocaleNavLink } from '../locale-helpers';
-import { CogIcon, DashboardIcon, MenuIcon } from '../ui/icons';
+import { MenuIcon, UserIcon } from '../ui/icons';
 import { Avatar, LinkButton } from '../ui/ui';
 import Content from './content';
 import Footer from './footer';
@@ -19,6 +19,8 @@ import Nav from './nav/nav';
 import UserMenu from './user-menu';
 import cx from 'classnames';
 import WelcomeModal from '../welcome-modal/welcome-modal';
+import { signOut } from 'supertokens-auth-react/recipe/session';
+
 import {
   ChallengeTeamToken,
   challengeTeamTokens,
@@ -36,6 +38,7 @@ interface PropsFromState {
 
 interface PropsFromDispatch {
   setLocale: typeof Locale.actions.set;
+  refreshUser: typeof User.actions.refresh;
 }
 
 interface LayoutProps
@@ -44,7 +47,6 @@ interface LayoutProps
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     RouteComponentProps<any, any, any> {
   children?: React.ReactNode;
-  shouldHideFooter?: boolean;
 }
 
 interface LayoutState {
@@ -153,8 +155,14 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
     );
   };
 
+  private onLogout = async () => {
+    await signOut();
+    this.props.refreshUser();
+    window.location.href = '/';
+  };
+
   render() {
-    const { children, locale, location, user, shouldHideFooter } = this.props;
+    const { children, locale, location, user } = this.props;
     const {
       challengeTeamToken,
       challengeToken,
@@ -286,7 +294,7 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
           data-testid={pathParts[2] ? pathParts.slice(2).join(' ') : 'home'}>
           {children ? children : <Content location={location} />}
         </main>
-        {shouldHideFooter ? <></> : <Footer />}
+        <Footer />
         <div
           id="navigation-modal"
           className={this.state.isMenuVisible ? 'active' : ''}>
@@ -294,7 +302,31 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
             shouldExpandNavItems={
               this.state.shouldExpandNavItems || !isContributionPageActive
             }
-            isContributionPageActive={isContributionPageActive}></Nav>
+            isContributionPageActive={isContributionPageActive}>
+            <div className="user-nav">
+              {user.account && (
+                <div>
+                  <LocaleNavLink
+                    className="user-nav-link"
+                    to={URLS.PROFILE_INFO}>
+                    <UserIcon />
+                    <Localized id="profile">
+                      <span />
+                    </Localized>
+                  </LocaleNavLink>
+                </div>
+              )}
+              {user.account ? (
+                <Localized id="logout">
+                  <LinkButton
+                    onClick={this.onLogout}
+                    rounded
+                    className="auth-button"
+                  />
+                </Localized>
+              ) : null}
+            </div>
+          </Nav>
         </div>
       </div>
     );
@@ -309,11 +341,12 @@ const mapStateToProps = (state: StateTree) => ({
 
 const mapDispatchToProps = {
   setLocale: Locale.actions.set,
+  refreshUser: User.actions.refresh,
 };
 
 export default withRouter(
   connect<PropsFromState, PropsFromDispatch>(
     mapStateToProps,
     mapDispatchToProps
-  )(Layout)
+  )(Layout as any)
 );
