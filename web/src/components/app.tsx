@@ -46,7 +46,6 @@ const WritePage = React.lazy(
 const ReviewPage = React.lazy(
   () => import('./pages/contribution/sentence-collector/review/review')
 );
-const DemoPage = React.lazy(() => import('./layout/demo-layout'));
 const SentryRoute = Sentry.withSentryRouting(Route);
 const SENTRY_DSN_WEB =
   'https://40742891598c4900aacac78dd1145d7e@o1069899.ingest.sentry.io/6251028';
@@ -290,7 +289,7 @@ let LocalizedPage: any = class extends React.Component<
             />
           ))}
 
-          {location.pathname.includes(URLS.DEMO) ? <DemoPage /> : <Layout />}
+          <Layout />
         </Switch>
       </>
     );

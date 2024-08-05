@@ -1,6 +1,5 @@
 const PROFILE = '/profile';
 const DASHBOARD = '/dashboard';
-const DEMO = '/demo';
 
 export default Object.freeze({
   ROOT: '',
@@ -41,12 +40,6 @@ export default Object.freeze({
   LANGUAGE_REQUEST: '/language/request',
   LANGUAGE_REQUEST_SUCCESS: '/language/request/success',
 
-  DEMO,
-  INTRO: DEMO,
-  DEMO_SPEAK: DEMO + '/speak',
-  DEMO_LISTEN: DEMO + '/listen',
-  DEMO_ACCOUNT: DEMO + '/create-profile',
-  DEMO_CONTRIBUTE: DEMO + '/contribute',
   TARGET_SEGMENT_INFO:
     'https://discourse.mozilla.org/t/help-create-common-voices-first-target-segment/59587',
   TARGET_SEGMENT_INFO_ES:
