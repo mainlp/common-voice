@@ -17,6 +17,7 @@ import {
 import { Locale } from '../stores/locale'
 import { User } from '../stores/user'
 import { USER_KEY } from '../stores/root'
+import { Metadata } from '../stores/demographics'
 
 interface FetchOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
@@ -267,7 +268,7 @@ export default class API {
     })
   }
 
-  getMetadata(): Promise<UserClient[]> {
+  getMetadata(): Promise<Metadata[]> {
     return this.fetch(API_PATH + '/user_client/get_metadata', {
       method: 'GET',
     })

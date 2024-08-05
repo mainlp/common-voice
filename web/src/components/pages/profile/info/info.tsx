@@ -59,7 +59,7 @@ function ProfileInfo({
   const [userFields, setUserFields] = useState<{
     username: string;
     visible: number | string;
-    age: number;
+    age: number | '';
     region: string;
     gender: string;
     sendEmails: boolean;
@@ -67,7 +67,7 @@ function ProfileInfo({
   }>({
     username: '',
     visible: 0,
-    age: 18,
+    age: '',
     region: '',
     gender: '',
     sendEmails: false,
@@ -90,6 +90,27 @@ function ProfileInfo({
     user?.userClients[0]?.enrollment || isEnrolled(account);
 
   useEffect(() => {
+    // fetch current values of user metadata
+    const fetchUserClients = async () => {
+      try {
+        const metadata = await api.getMetadata();
+        if (metadata.length > 0) {
+          setUserFields(prevFields => ({
+            ...prevFields,
+            age: metadata[0].age,
+            gender: metadata[0].gender || prevFields.gender,
+            region: metadata[0].region || prevFields.region,
+          }));
+        }
+      } catch (error) {
+        console.error('Failed to fetch user clients:', error);
+      }
+    };
+
+    fetchUserClients();
+  }, []);
+
+  useEffect(() => {
     if (user.isFetchingAccount || areLanguagesLoading) {
       return;
     }
@@ -106,7 +127,7 @@ function ProfileInfo({
       ...(account
         ? pick(account, 'ageNum', 'username', 'gender', 'visible')
         : {
-            ageNum: userClients.reduce((init, u) => u.age || init, 18),
+            ageNum: userClients.reduce((init, u) => u.age || init, ''),
             gender: userClients.reduce((init, u) => u.gender || init, ''),
           }),
       privacyAgreed: Boolean(account) || user.privacyAgreed,
@@ -138,66 +159,18 @@ function ProfileInfo({
       });
     };
 
-  const submit = useCallback(() => {
-    const uc: UserClient = {
-      ageNum: userFields.age,
-      gender: userFields.gender,
-      region: userFields.region,
-    };
-    this.props.api.updateMetadata(uc);
-    /*
-    if (!user.account) {
-      trackProfile('create', locale);
-
-      if (termsStatus == null) {
-        setTermsStatus('show');
-        return;
-      }
-    }
-
-    setIsSaving(true);
-    setIsSubmitted(true);
-    setTermsStatus('agreed');
-
-    const data = {
-      ...pick(userFields, 'username', 'gender'),
-      languages: userLanguages.filter(l => l.locale),
-      visible: JSON.parse(visible.toString()),
-      client_id: user.userId,
-      ageNum: age,
-      enrollment: user.userClients[0].enrollment || {
-        team: null,
-        challenge: null,
-        invite: null,
-      },
-    };
-
-    addUploads([
-      async () => {
-        await saveAccount(data);
-        if (!user.account?.basket_token && sendEmails) {
-          await api.subscribeToNewsletter(user.userClients[0]?.email);
-        }
-
-        addNotification(getString('profile-form-submit-saved'));
-        setIsSaving(false);
-      },
-    ]);*/
-  }, [api, userFields]);
-
   const handleSubmit = useCallback(
     (event: React.FormEvent) => {
       event.preventDefault();
-      console.log(userFields);
       const uc: UserClient = {
         ageNum: userFields.age,
         gender: userFields.gender,
         region: userFields.region,
       };
       api.updateMetadata(uc);
-      //submit();
+      addNotification(getString('profile-form-submit-saved'));
     },
-    [api, submit]
+    [api, userFields]
   );
 
   return (

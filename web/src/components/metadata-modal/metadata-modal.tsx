@@ -13,18 +13,27 @@ import {
 interface Props {
   onRequestClose: () => void;
   onSubmit: (metadata: Metadata) => void;
+  initGender: string;
+  initAge: number;
+  initRegion: string;
 }
 
-export default function MetadataModal({ onRequestClose, onSubmit }: Props) {
-  const [gender, setGender] = useState('');
-  const [age, setAge] = useState('');
-  const [region, setRegion] = useState('');
+export default function MetadataModal({
+  onRequestClose,
+  onSubmit,
+  initGender,
+  initAge,
+  initRegion,
+}: Props) {
+  const [gender, setGender] = useState(initGender);
+  const [age, setAge] = useState(initAge);
+  const [region, setRegion] = useState(initRegion);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const metadata: Metadata = {
       gender,
-      age: age === '' ? '' : parseInt(age, 10),
+      age,
       region,
     };
     onSubmit(metadata);

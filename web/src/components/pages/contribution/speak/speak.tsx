@@ -87,7 +87,7 @@ interface State {
   clips: SentenceRecording[];
   isSubmitted: boolean;
   error?: RecordingError | AudioError;
-  metadata?: Metadata;
+  metadata: Metadata;
   recordingStatus: RecordingStatus;
   rerecordIndex?: number;
   showPrivacyModal: boolean;
@@ -102,7 +102,11 @@ const initialState: State = {
   clips: [],
   isSubmitted: false,
   error: null,
-  metadata: null,
+  metadata: {
+    age: 18,
+    region: '',
+    gender: '',
+  },
   recordingStatus: null,
   rerecordIndex: null,
   showPrivacyModal: false,
@@ -170,8 +174,13 @@ class SpeakPage extends React.Component<Props, State> {
     document.addEventListener('keyup', this.handleKeyUp);
 
     // only show the metadata modal if we do not have metadata recorded for this client id
-    const client_ids = await this.props.api.getMetadata();
-    this.setState({ showMetadataModal: client_ids.length == 0 });
+    const metadata = await this.props.api.getMetadata();
+    this.setState({ showMetadataModal: metadata.length == 0 });
+    if (metadata.length > 0) {
+      this.setState({
+        metadata: metadata[0],
+      });
+    }
     if (
       !this.audio.isMicrophoneSupported() ||
       !this.audio.isAudioRecordingSupported()
@@ -631,6 +640,9 @@ class SpeakPage extends React.Component<Props, State> {
             <MetadataModal
               onSubmit={this.handleMetadataSubmit}
               onRequestClose={this.toggleMetadataModal}
+              initAge={this.state.metadata.age}
+              initRegion={this.state.metadata.region}
+              initGender={this.state.metadata.gender}
             />
           )}
           {noNewClips && isLoading && <Spinner delayMs={500} />}

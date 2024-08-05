@@ -282,7 +282,7 @@ export const MAX_AGE = 99;
 
 export interface Metadata {
   gender: string;
-  age: number | '';
+  age: number;
   region: string;
 }
 
