@@ -103,7 +103,6 @@ class ListenPage extends React.Component<Props, State> {
   playedSomeInterval: any;
 
   state: State = initialState;
-  demoMode = this.props.location.pathname.includes(URLS.DEMO);
 
   static getDerivedStateFromProps(props: Props, state: State) {
     if (state.clips.length > 0) return null;
@@ -359,14 +358,14 @@ class ListenPage extends React.Component<Props, State> {
           />
           <ContributionPage
             activeIndex={clipIndex}
-            demoMode={this.demoMode}
+            demoMode={false}
             hasErrors={!isLoading && (isMissingClips || hasLoadingError)}
             errorContent={
               <ListenErrorContent
                 isLoading={isLoading}
                 hasLoadingError={hasLoadingError}
                 isMissingClips={isMissingClips}
-                isDemoMode={this.demoMode}
+                isDemoMode={false}
               />
             }
             instruction={props =>

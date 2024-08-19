@@ -1,22 +1,22 @@
-import { Localized } from '@fluent/react'
-import classNames from 'classnames'
-import React from 'react'
+import { Localized } from '@fluent/react';
+import classNames from 'classnames';
+import React from 'react';
 
-import { ContributableLocaleLock, LocaleLink } from '../../locale-helpers'
+import { ContributableLocaleLock, LocaleLink } from '../../locale-helpers';
 import {
   EditIcon,
   ListenIcon,
   MenuIcon,
   MicIcon,
   ReviewIcon,
-} from '../../ui/icons'
-import URLS from '../../../urls'
+} from '../../ui/icons';
+import URLS from '../../../urls';
 
 type SecondaryNavProps = {
-  isDemoMode: boolean
-  handleSecondaryNavMobileMenuClick: () => void
-  isLoggedIn: boolean
-}
+  isDemoMode: boolean;
+  handleSecondaryNavMobileMenuClick: () => void;
+  isLoggedIn: boolean;
+};
 
 export const SecondaryNav: React.FC<SecondaryNavProps> = ({
   isDemoMode,
@@ -28,7 +28,7 @@ export const SecondaryNav: React.FC<SecondaryNavProps> = ({
     <div className="options">
       <ContributableLocaleLock>
         <LocaleLink
-          to={isDemoMode ? URLS.DEMO_SPEAK : URLS.SPEAK}
+          to={URLS.SPEAK}
           className={classNames('secondary-nav-option', {
             'selected-option': location.pathname.includes(URLS.SPEAK),
           })}>
@@ -38,7 +38,7 @@ export const SecondaryNav: React.FC<SecondaryNavProps> = ({
           </div>
         </LocaleLink>
         <LocaleLink
-          to={isDemoMode ? URLS.DEMO_LISTEN : URLS.LISTEN}
+          to={URLS.LISTEN}
           className={classNames('secondary-nav-option', {
             'selected-option': location.pathname.includes(URLS.LISTEN),
           })}>
@@ -72,4 +72,4 @@ export const SecondaryNav: React.FC<SecondaryNavProps> = ({
       )}
     </div>
   </div>
-)
+);

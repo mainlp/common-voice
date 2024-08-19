@@ -282,39 +282,6 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
             shouldShowFirstCTA ? 'first-cta-visible' : '',
             shouldShowSecondCTA ? 'second-cta-visible' : '',
           ].join(' ')}>
-          <div className="top">
-            {demoMode && (
-              <LocaleLink
-                to={
-                  user.account && !demoMode
-                    ? URLS.DASHBOARD
-                    : demoMode
-                    ? URLS.DEMO_CONTRIBUTE
-                    : URLS.ROOT
-                }
-                className="back">
-                <ArrowLeft />
-              </LocaleLink>
-            )}
-
-            {demoMode && (
-              <div className="links">
-                <Localized id="speak">
-                  <LocaleNavLink
-                    className={getTrackClass('fs', `toggle-speak`)}
-                    to={URLS.DEMO_SPEAK}
-                  />
-                </Localized>
-                <Localized id="listen">
-                  <LocaleNavLink
-                    className={getTrackClass('fs', `toggle-listen`)}
-                    to={URLS.DEMO_LISTEN}
-                  />
-                </Localized>
-              </div>
-            )}
-            <div className="mobile-break" />
-          </div>
           {this.renderContent()}
         </div>
       </div>

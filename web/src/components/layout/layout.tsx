@@ -179,7 +179,6 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
     ];
 
     const isBuildingProfile = location.pathname.includes(URLS.PROFILE_INFO);
-    const isDemoMode = location.pathname.includes(URLS.DEMO);
     const isContributionPageActive = CONTRIBUTION_PAGES.includes(
       location.pathname
     );
@@ -283,7 +282,7 @@ class Layout extends React.PureComponent<LayoutProps, LayoutState> {
               handleSecondaryNavMobileMenuClick={
                 handleSecondaryNavMobileMenuClick
               }
-              isDemoMode={isDemoMode}
+              isDemoMode={false}
               isLoggedIn={Boolean(user.account)}
             />
           )}
