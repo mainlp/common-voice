@@ -25,6 +25,8 @@ import Challenge from './challenge';
 import Takeout from './takeout';
 import NotificationQueue, { uploadImage } from './queues/imageQueue';
 import {task as T, taskEither as TE, identity as Id} from 'fp-ts'
+import supertokens from "supertokens-node";
+import {deleteUser} from "supertokens-node";
 
 import validate, {
   jobSchema,
@@ -75,6 +77,7 @@ export default class API {
     router.post('/user_clients/:client_id/claim', this.claimUserClient);
     router.get('/user_client', this.getAccount);
     router.patch('/user_client', this.saveAccount);
+    router.post('/user_client/delete_account/:email/:keepRecordings', this.deleteAccount);
     router.patch('/anonymous_user', this.saveAnonymousAccountLanguages);
     router.post(
       '/user_client/avatar/:type',
@@ -272,6 +275,19 @@ export default class API {
       await UserClient.saveAnonymousAccountLanguages(client_id, languages)
     );
   };
+
+  deleteAccount = async (request: Request, response: Response) => {
+    const { email, keepRecordings } = request.params;
+    let usersInfo = await supertokens.listUsersByAccountInfo("public", {
+      email: email
+    });
+    if (usersInfo.length == 0) {
+      throw new ClientParameterError();
+    }
+
+    await UserClient.deleteUserClientData(email.trim(),keepRecordings);
+    await deleteUser(usersInfo[0].id);
+  }
 
   saveAccount = async (request: Request, response: Response) => {
     const { body } = request;

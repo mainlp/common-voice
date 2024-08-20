@@ -1128,7 +1128,7 @@ share-goal = Mein Ziel teilen
 
 ## Profile Delete
 
-delete-q = Sollen Ihre Stimmaufzeichnungen ebenfalls gelöscht werden, oder wäre es Ihnen lieber, wenn diese im Common-Voice-Datensatz verblieben?
+delete-q = Sollen Ihre Stimmaufzeichnungen ebenfalls gelöscht werden, oder wäre es Ihnen lieber, wenn diese im Bavarian-Voice-Datensatz verblieben?
 keep = Erhalten
 remove = Löschen
 keep-info = Ihre anonymen Stimmaufzeichnungen verbleiben im Common-Voice-Datensatz. Nachdem Sie Ihr Profil gelöscht haben, können Sie die Löschung Ihrer Aufzeichnungen aus dem Datensatz nicht mehr beantragen.

@@ -425,6 +425,7 @@ const UserClient = {
 
   async findAccount(email: string): Promise<UserClientType> {
     // @TOOD: this would be better split out into a few smaller queries than one giant query, surely???
+
     const [rows] = await db.query(
       `
         SELECT u.*
@@ -433,7 +434,6 @@ const UserClient = {
       `,
       [email]
     );
-    
 
     const clientId = rows[0] ? rows[0].client_id : null;
     const [custom_goals, awards]: any = clientId
@@ -493,7 +493,6 @@ const UserClient = {
     email: string,
     { client_id, languages, ...data }: UserClientType
   ) {
-    console.log("user client in save Account");
     const [accountClientId, [clients]] = await Promise.all([
       UserClient.findClientId(email),
       email
@@ -516,7 +515,7 @@ const UserClient = {
     await db.query(
       `
         UPDATE user_clients
-        SET ${userData.join(', ')}
+        SET ${userData.join(', ')}, has_login = 1
         WHERE client_id = '${clientId}'
       `
     );
@@ -555,7 +554,26 @@ const UserClient = {
         data.enrollment.challenge,
       ]);
     }
-    return clientId;
+    const userClient = await UserClient.findAccount(email);
+    userClient.client_id = clientId;
+    return userClient;
+  },
+
+  async deleteUserClientData(email: string, keepRecordings: boolean) {
+    const client_id = await this.findClientId(email);
+
+    if (!client_id) {
+      return false;
+    }
+    if (!keepRecordings){
+      await db.query('DELETE FROM clips WHERE client_id = ?', [client_id]);
+      await db.query('DELETE FROM demographics WHERE client_id = ?', [client_id]);
+    }
+    await db.query('DELETE FROM votes WHERE client_id = ?', [client_id]);
+    await db.query('DELETE FROM user_client_activities WHERE client_id = ?', [client_id]);
+    await db.query('DELETE FROM user_clients WHERE client_id = ?', [client_id]);
+
+    return true;
   },
 
   async getMetadataForClient(clientId: string){
