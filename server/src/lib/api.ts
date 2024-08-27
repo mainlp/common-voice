@@ -277,7 +277,8 @@ export default class API {
   };
 
   deleteAccount = async (request: Request, response: Response) => {
-    const { email, keepRecordings } = request.params;
+    const { email } = request.params;
+    const keepRecordings = Boolean(request.params.keepRecordings);
     let usersInfo = await supertokens.listUsersByAccountInfo("public", {
       email: email
     });

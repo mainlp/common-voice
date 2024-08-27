@@ -258,7 +258,7 @@ export default class API {
   }
 
   deleteAccount(email: string, keepRecordings: boolean): Promise<void> {
-    return this.fetch(API_PATH + '/user_client/delete_account/ ' + email + '/' + {keepRecordings}, {
+    return this.fetch(API_PATH + '/user_client/delete_account/ ' + email + '/' + keepRecordings, {
       method: 'POST',
     })
   }
