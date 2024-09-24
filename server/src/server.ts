@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as http from 'http';
+import * as https from 'https';
 import * as path from 'path';
 import * as express from 'express';
 import * as compression from 'compression';
@@ -288,10 +289,14 @@ export default class Server {
    */
   listen(): void {
     // Begin handling requests before clip list is loaded.
+    const tls_files = {
+      cert: fs.readFileSync("/code/certs/letsencrypt/live/lmslcis-commonvoice.srv.mwn.de/fullchain.pem"),
+      key:  fs.readFileSync("/code/certs/letsencrypt/live/lmslcis-commonvoice.srv.mwn.de/privkey.pem")
+    }
+      
     const port = getConfig().SERVER_PORT;
-    this.server = this.app.listen(port, () =>
-      this.print(`listening at http://localhost:${port}`)
-    );
+
+    https.createServer(tls_files, this.app).listen(port)
   }
   /**
    * Make sure we have a connection to the database.
