@@ -1,28 +1,28 @@
-import * as React from 'react'
+import * as React from 'react';
 import {
   Localized,
   WithLocalizationProps,
   withLocalization,
-} from '@fluent/react'
-import classNames from 'classnames'
+} from '@fluent/react';
+import classNames from 'classnames';
 
-import { ContributableLocaleLock, LocaleLink } from '../../locale-helpers'
-import { EditIcon, ListenIcon, MicIcon, ReviewIcon } from '../../ui/icons'
-import URLS from '../../../urls'
+import { ContributableLocaleLock, LocaleLink } from '../../locale-helpers';
+import { EditIcon, ListenIcon, MicIcon, ReviewIcon } from '../../ui/icons';
+import URLS from '../../../urls';
 
 type ContributeMenuContentProps = {
-  className?: string
-  pathname?: string
-  isUserLoggedIn: boolean
-}
+  className?: string;
+  pathname?: string;
+  isUserLoggedIn: boolean;
+};
 
 const ContributeMenuContent: React.FC<
   ContributeMenuContentProps & WithLocalizationProps
 > = ({ className, pathname = '', isUserLoggedIn, getString }) => {
-  const speakActive = pathname.includes(URLS.SPEAK)
-  const listenActive = pathname.includes(URLS.LISTEN)
-  const writeActive = pathname.includes(URLS.WRITE)
-  const reviewActive = pathname.includes(URLS.REVIEW)
+  const speakActive = pathname.includes(URLS.SPEAK);
+  const listenActive = pathname.includes(URLS.LISTEN);
+  const writeActive = pathname.includes(URLS.WRITE);
+  const reviewActive = pathname.includes(URLS.REVIEW);
 
   return (
     <div className={className}>
@@ -58,8 +58,10 @@ const ContributeMenuContent: React.FC<
             </li>
           </ul>
         </div>
+      {/* 
         <div className="vertical-line" />
       </ContributableLocaleLock>
+      
       <div>
         <Localized id="contribute-sentence-collection-nav-header">
           <p className="nav-header-item" />
@@ -92,9 +94,9 @@ const ContributeMenuContent: React.FC<
             </li>
           )}
         </ul>
-      </div>
+      </div>*/}
     </div>
-  )
-}
+  );
+};
 
-export default withLocalization(ContributeMenuContent)
+export default withLocalization(ContributeMenuContent);

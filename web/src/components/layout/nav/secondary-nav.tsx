@@ -48,6 +48,7 @@ export const SecondaryNav: React.FC<SecondaryNavProps> = ({
           </div>
         </LocaleLink>
       </ContributableLocaleLock>
+      {/*
       <LocaleLink
         to={URLS.WRITE}
         className={classNames('secondary-nav-option', {
@@ -70,6 +71,7 @@ export const SecondaryNav: React.FC<SecondaryNavProps> = ({
           </div>
         </LocaleLink>
       )}
+    */}
     </div>
   </div>
 );

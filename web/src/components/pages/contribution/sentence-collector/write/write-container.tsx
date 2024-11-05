@@ -1,3 +1,4 @@
+/* NOT USED FOR NOW. Still keep the code as we might use this functionality later.
 import * as React from 'react';
 
 import SentenceCollectionWrapper from '../sentence-collector-wrapper';
@@ -74,3 +75,4 @@ const WriteContainer = () => {
 };
 
 export default WriteContainer;
+*/

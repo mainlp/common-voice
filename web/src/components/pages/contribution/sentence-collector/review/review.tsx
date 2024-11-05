@@ -1,3 +1,4 @@
+/* NOT USED FOR NOW. Still keep the code as we might use this functionality later.
 import * as React from 'react'
 import {
   Localized,
@@ -223,3 +224,4 @@ const Review: React.FC<Props> = ({ getString }) => {
 }
 
 export default withLocalization(Review)
+*/
