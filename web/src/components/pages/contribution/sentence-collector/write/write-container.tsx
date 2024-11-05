@@ -1,5 +1,4 @@
-/* NOT USED FOR NOW. Still keep the code as we might use this functionality later.
-import * as React from 'react';
+/*import * as React from 'react';
 
 import SentenceCollectionWrapper from '../sentence-collector-wrapper';
 import SingleSubmissionWrite from './single-submission-write/single-submission-write';

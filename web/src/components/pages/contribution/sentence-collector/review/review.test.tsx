@@ -1,4 +1,4 @@
-import * as React from 'react'
+/*import * as React from 'react'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import Review from './review'
@@ -272,3 +272,4 @@ describe('Review page', () => {
     spy.mockRestore()
   })
 })
+*/

@@ -26,41 +26,39 @@ const ContributeMenuContent: React.FC<
 
   return (
     <div className={className}>
-      <ContributableLocaleLock>
-        <div>
-          <Localized id="contribute-voice-collection-nav-header">
-            <p className="nav-header-item" />
-          </Localized>
-          <ul>
-            <li
-              className={classNames({
-                'selected-option': speakActive,
-              })}
-              title={getString('speak')}>
-              <div className="content">
-                <MicIcon />
-                <LocaleLink to={URLS.SPEAK} className="contribute-link">
-                  <Localized id="speak" />
-                </LocaleLink>
-              </div>
-            </li>
-            <li
-              className={classNames({
-                'selected-option': listenActive,
-              })}
-              title={getString('listen')}>
-              <div className="content">
-                <ListenIcon />
-                <LocaleLink to={URLS.LISTEN} className="contribute-link">
-                  <Localized id="listen" />
-                </LocaleLink>
-              </div>
-            </li>
-          </ul>
-        </div>
+      <div>
+        <Localized id="contribute-voice-collection-nav-header">
+          <p className="nav-header-item" />
+        </Localized>
+        <ul>
+          <li
+            className={classNames({
+              'selected-option': speakActive,
+            })}
+            title={getString('speak')}>
+            <div className="content">
+              <MicIcon />
+              <LocaleLink to={URLS.SPEAK} className="contribute-link">
+                <Localized id="speak" />
+              </LocaleLink>
+            </div>
+          </li>
+          <li
+            className={classNames({
+              'selected-option': listenActive,
+            })}
+            title={getString('listen')}>
+            <div className="content">
+              <ListenIcon />
+              <LocaleLink to={URLS.LISTEN} className="contribute-link">
+                <Localized id="listen" />
+              </LocaleLink>
+            </div>
+          </li>
+        </ul>
+      </div>
       {/* 
         <div className="vertical-line" />
-      </ContributableLocaleLock>
       
       <div>
         <Localized id="contribute-sentence-collection-nav-header">

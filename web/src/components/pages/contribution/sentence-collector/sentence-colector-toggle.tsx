@@ -1,4 +1,4 @@
-import * as React from 'react'
+/*import * as React from 'react'
 import { Localized } from '@fluent/react'
 import classNames from 'classnames'
 
@@ -66,3 +66,4 @@ const SentenceCollectorToggle: React.FC<Props> = ({
 )
 
 export default SentenceCollectorToggle
+*/

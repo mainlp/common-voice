@@ -1,50 +1,49 @@
-/* NOT USED FOR NOW. Still keep the code as we might use this functionality later.
-import * as React from 'react'
+/*import * as React from 'react';
 import {
   Localized,
   WithLocalizationProps,
   withLocalization,
-} from '@fluent/react'
-import { Tooltip } from 'react-tippy'
+} from '@fluent/react';
+import { Tooltip } from 'react-tippy';
 
 import {
   KeyboardIcon,
   QuestionIcon,
   ReviewIcon,
   SkipIcon,
-} from '../../../../ui/icons'
-import { Button, LinkButton } from '../../../../ui/ui'
-import SentenceCollectionWrapper from '../sentence-collector-wrapper'
-import { Instruction } from '../instruction'
-import ReviewCard from './review-card'
-import { VoteButton } from '../../listen/listen'
-import { Rules } from '../write/sentence-input-and-rules/rules'
-import { ReportButton } from '../../report/report'
-import ReviewEmptyState from './review-empty-state'
-import { Spinner } from '../../../../ui/ui'
-import { ReportModal } from '../../report/report'
-import ReviewShortcutsModal from './review-shortcuts-modal'
+} from '../../../../ui/icons';
+import { Button, LinkButton } from '../../../../ui/ui';
+import SentenceCollectionWrapper from '../sentence-collector-wrapper';
+import { Instruction } from '../instruction';
+import ReviewCard from './review-card';
+import { VoteButton } from '../../listen/listen';
+import { Rules } from '../write/sentence-input-and-rules/rules';
+import { ReportButton } from '../../report/report';
+import ReviewEmptyState from './review-empty-state';
+import { Spinner } from '../../../../ui/ui';
+import { ReportModal } from '../../report/report';
+import ReviewShortcutsModal from './review-shortcuts-modal';
 
-import { useAccount, useSentences } from '../../../../../hooks/store-hooks'
-import useReview from './use-review'
-import { useLocale } from '../../../../locale-helpers'
-import { trackSingleReview } from '../../../../../services/tracker'
+import { useAccount, useSentences } from '../../../../../hooks/store-hooks';
+import useReview from './use-review';
+import { useLocale } from '../../../../locale-helpers';
+import { trackSingleReview } from '../../../../../services/tracker';
 
-import URLS from '../../../../../urls'
+import URLS from '../../../../../urls';
 
-import { ReportModalProps } from '../../report/report'
+import { ReportModalProps } from '../../report/report';
 
-import './review.css'
+import './review.css';
 
-type Props = WithLocalizationProps
+type Props = WithLocalizationProps;
 
 const Review: React.FC<Props> = ({ getString }) => {
-  const [showReportModal, setShowReportModal] = React.useState(false)
-  const [showShortcutsModal, setShowShortcutsModal] = React.useState(false)
+  const [showReportModal, setShowReportModal] = React.useState(false);
+  const [showShortcutsModal, setShowShortcutsModal] = React.useState(false);
 
-  const [currentLocale] = useLocale()
-  const account = useAccount()
-  const sentences = useSentences()
+  const [currentLocale] = useLocale();
+  const account = useAccount();
+  const sentences = useSentences();
 
   const {
     handleFetch,
@@ -56,29 +55,29 @@ const Review: React.FC<Props> = ({ getString }) => {
   } = useReview({
     getString,
     showReportModal,
-  })
+  });
 
   const pendingSentencesSubmissions =
-    sentences[currentLocale]?.pendingSentences || []
+    sentences[currentLocale]?.pendingSentences || [];
 
   const activeSentenceIndex = pendingSentencesSubmissions.findIndex(
     el => el.isValid === null
-  )
+  );
 
   const handleToggleShortcutsModal = () => {
-    setShowShortcutsModal(!showShortcutsModal)
-  }
+    setShowShortcutsModal(!showShortcutsModal);
+  };
 
   const handleReportButtonClick = () => {
-    setShowReportModal(true)
-    trackSingleReview('report-button-click', currentLocale)
-  }
+    setShowReportModal(true);
+    trackSingleReview('report-button-click', currentLocale);
+  };
 
-  const isLoading = sentences[currentLocale]?.isLoadingPendingSentences
+  const isLoading = sentences[currentLocale]?.isLoadingPendingSentences;
 
   const noPendingSentences =
     (!isLoading && pendingSentencesSubmissions.length === 0) ||
-    activeSentenceIndex < 0
+    activeSentenceIndex < 0;
 
   const reportModalProps = {
     reasons: [
@@ -89,33 +88,33 @@ const Review: React.FC<Props> = ({ getString }) => {
     ],
     kind: 'sentence' as ReportModalProps['kind'],
     id: pendingSentencesSubmissions[activeSentenceIndex]?.sentenceId,
-  }
+  };
 
   React.useEffect(() => {
-    handleFetch()
-  }, [])
+    handleFetch();
+  }, []);
 
   React.useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [handleKeyDown])
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [handleKeyDown]);
 
   if (!account) {
     try {
-      sessionStorage.setItem('redirectURL', location.pathname)
+      sessionStorage.setItem('redirectURL', location.pathname);
     } catch (error) {
-      console.warn(`A sessionStorage error occurred ${error.message}`)
+      console.warn(`A sessionStorage error occurred ${error.message}`);
     }
 
-    window.location.href = '/login'
-    return <Spinner />
+    window.location.href = '/login';
+    return <Spinner />;
   }
 
   if (isLoading) {
-    return <Spinner />
+    return <Spinner />;
   }
 
   if (noPendingSentences) {
@@ -123,7 +122,7 @@ const Review: React.FC<Props> = ({ getString }) => {
       <SentenceCollectionWrapper dataTestId="review-page" type="review">
         <ReviewEmptyState />
       </SentenceCollectionWrapper>
-    )
+    );
   }
 
   return (
@@ -220,8 +219,8 @@ const Review: React.FC<Props> = ({ getString }) => {
         </div>
       </div>
     </SentenceCollectionWrapper>
-  )
-}
+  );
+};
 
-export default withLocalization(Review)
+export default withLocalization(Review);
 */

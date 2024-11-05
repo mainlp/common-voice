@@ -40,12 +40,12 @@ const ListenPage = React.lazy(
   () => import('./pages/contribution/listen/listen')
 );
 const SpeakPage = React.lazy(() => import('./pages/contribution/speak/speak'));
-const WritePage = React.lazy(
+/*const WritePage = React.lazy(
   () => import('./pages/contribution/sentence-collector/write/write-container')
 );
 const ReviewPage = React.lazy(
   () => import('./pages/contribution/sentence-collector/review/review')
-);
+);*/
 const SentryRoute = Sentry.withSentryRouting(Route);
 const SENTRY_DSN_WEB =
   'https://40742891598c4900aacac78dd1145d7e@o1069899.ingest.sentry.io/6251028';
@@ -270,8 +270,9 @@ let LocalizedPage: any = class extends React.Component<
           {[
             { route: URLS.SPEAK, Component: SpeakPage },
             { route: URLS.LISTEN, Component: ListenPage },
-            { route: URLS.WRITE, Component: WritePage },
-            { route: URLS.REVIEW, Component: ReviewPage },
+            //NOT USED FOR NOW. Still keep the code as we might use this functionality later.
+            //{ route: URLS.WRITE, Component: WritePage },
+            //{ route: URLS.REVIEW, Component: ReviewPage },
           ].map(({ route, Component }: any) => (
             <SentryRoute
               key={route}
