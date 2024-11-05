@@ -495,9 +495,11 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
               </Button>
             )}
             <div className="extra-buttons">
-              <ReportButton
-                onClick={() => this.setState({ showReportModal: true })}
-              />
+              {type == 'listen' && (
+                <ReportButton
+                  onClick={() => this.setState({ showReportModal: true })}
+                />
+              )}
               <Tooltip title="Shortcuts" arrow>
                 <Button
                   rounded
