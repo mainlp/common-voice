@@ -125,7 +125,6 @@ export default function HomePage() {
         className={classNames('stats', { 'logged-in': user.account })}
         id="stats">
         <ClipsStats.Root />
-        <VoiceStats />
       </div>
 
       {user.account && (
