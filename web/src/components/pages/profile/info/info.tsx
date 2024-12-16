@@ -15,12 +15,7 @@ import {
   useLocalStorageState,
 } from '../../../../hooks/store-hooks';
 import { trackProfile } from '../../../../services/tracker';
-import {
-  REGIONS,
-  GENDERS,
-  MIN_AGE,
-  MAX_AGE,
-} from '../../../../stores/demographics';
+import { REGIONS, GENDERS, AGE_GROUPS } from '../../../../stores/demographics';
 import { Notifications } from '../../../../stores/notifications';
 import { useTypedSelector } from '../../../../stores/tree';
 import { Uploads } from '../../../../stores/uploads';
@@ -59,7 +54,7 @@ function ProfileInfo({
   const [userFields, setUserFields] = useState<{
     username: string;
     visible: number | string;
-    age: number | '';
+    age: string;
     region: string;
     gender: string;
     sendEmails: boolean;
@@ -123,11 +118,11 @@ function ProfileInfo({
       ...userFields,
       sendEmails: !!account?.basket_token,
       visible: 0,
-      ...pick(user, 'ageNum', 'username', 'gender'),
+      ...pick(user, 'age', 'username', 'gender'),
       ...(account
-        ? pick(account, 'ageNum', 'username', 'gender', 'visible')
+        ? pick(account, 'age', 'username', 'gender', 'visible')
         : {
-            ageNum: userClients.reduce((init, u) => u.age || init, ''),
+            age: userClients.reduce((init, u) => u.age || init, ''),
             gender: userClients.reduce((init, u) => u.gender || init, ''),
           }),
       privacyAgreed: Boolean(account) || user.privacyAgreed,
@@ -163,7 +158,7 @@ function ProfileInfo({
     (event: React.FormEvent) => {
       event.preventDefault();
       const uc: UserClient = {
-        ageNum: userFields.age,
+        age: userFields.age,
         gender: userFields.gender,
         region: userFields.region,
       };
@@ -220,16 +215,10 @@ function ProfileInfo({
             </LabeledSelect>
           </Localized>
 
-          <LabeledInput
-            name="age"
-            type="number"
-            label="Alter"
-            min={MIN_AGE}
-            max={MAX_AGE}
-            value={age}
-            onChange={handleChangeFor('age')}
-            required
-          />
+          <LabeledSelect value={age} onChange={handleChangeFor('age')} required>
+            <option value="">Bitte wählen</option>
+            <Options>{AGE_GROUPS}</Options>
+          </LabeledSelect>
         </div>
 
         <div className="signup-section">

@@ -587,7 +587,7 @@ const UserClient = {
     return rows
   },
   
-  async updateMetadata({ gender, region, ageNum }: UserClientType, client_id: string) {
+  async updateMetadata({ gender, region, age }: UserClientType, client_id: string) {
 
     await db.query(
       `
@@ -598,9 +598,8 @@ const UserClient = {
         region = VALUES(region),
         updated_at = CURRENT_TIMESTAMP;
       `,
-      [client_id, ageNum, gender, region]
+      [client_id, age, gender, region]
     );
-
     return client_id;
   },
 

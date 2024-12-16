@@ -282,19 +282,29 @@ export const MAX_AGE = 99;
 
 export interface Metadata {
   gender: string;
-  age: number;
+  age: string;
   region: string;
 }
 
+export const AGE_GROUPS = {
+  twenties: '18-29',
+  thirties: '30-39',
+  forties: '40-49',
+  fivties: '50-59',
+  sixty_plus: '60+',
+  pref_not_to_say: 'Keine Angabe',
+}
 
 export const REGIONS = {
   region_ob: 'Oberbayern',
   region_nb: 'Niederbayern',
   region_op: 'Oberpfalz',
+  pref_not_to_say: 'Keine Angabe',
 }
 
 export const GENDERS: Gender = {
   male_masculine: 'Männlich',
   female_feminine: 'Weiblich',
   divers: "Divers",
+  pref_not_to_say: 'Keine Angabe',
 };

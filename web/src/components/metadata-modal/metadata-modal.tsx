@@ -1,8 +1,15 @@
 import { Localized } from '@fluent/react';
 import React, { useState } from 'react';
 import Modal from '../modal/modal';
-import { Button, LabeledInput, LabeledSelect, Options } from '../ui/ui';
 import {
+  Button,
+  LabeledCheckbox,
+  LabeledInput,
+  LabeledSelect,
+  Options,
+} from '../ui/ui';
+import {
+  AGE_GROUPS,
   REGIONS,
   GENDERS,
   MIN_AGE,
@@ -14,7 +21,7 @@ interface Props {
   onRequestClose: () => void;
   onSubmit: (metadata: Metadata) => void;
   initGender: string;
-  initAge: number;
+  initAge: string;
   initRegion: string;
 }
 
@@ -52,15 +59,13 @@ export default function MetadataModal({
 
         {/* Age section */}
         <h3 className="tw-py-2">Alter</h3>
-        <LabeledInput
-          name="age"
-          type="number"
-          min={MIN_AGE}
-          max={MAX_AGE}
+        <LabeledSelect
           value={age}
           onChange={(event: any) => setAge(event.target.value)}
-          required
-        />
+          required>
+          <option value="">Bitte wählen</option>
+          <Options>{AGE_GROUPS}</Options>
+        </LabeledSelect>
 
         {/* Gender section */}
         <h3 className="tw-pb-2">Geschlecht</h3>
@@ -83,6 +88,18 @@ export default function MetadataModal({
             <Options>{REGIONS}</Options>
           </LabeledSelect>
         </div>
+
+        <LabeledCheckbox
+          required
+          label={
+            <>
+              Ich stimme den{' '}
+              <a href="/terms" target="_blank">
+                Nutzungsbedingungen
+              </a>{' '}
+              zu.
+            </>
+          }></LabeledCheckbox>
 
         {/* Submit button */}
         <Button className="submit tw-mt-4" type="submit">

@@ -8,7 +8,6 @@ export type UserClient = {
   client_id?: string;
   // age is a categorical attribute used for the accounts logic in the existing code. Remove this later
   age?: string;
-  ageNum?: number | '';
   gender?: string;
   region?: string;
   languages?: UserLanguage[];
@@ -28,4 +27,5 @@ export type Gender = {
   male_masculine: string;
   female_feminine: string;
   divers: string;
+  pref_not_to_say: string,
 };

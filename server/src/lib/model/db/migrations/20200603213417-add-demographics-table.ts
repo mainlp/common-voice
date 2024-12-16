@@ -13,7 +13,7 @@ export const up = async function (db: any): Promise<any> {
       CREATE TABLE demographics (
         id BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
         client_id CHAR(36) NOT NULL,
-        age TINYINT UNSIGNED NOT NULL,
+        age VARCHAR(30),
         age_id BIGINT(20) UNSIGNED,
         gender_id BIGINT(20) UNSIGNED,
         gender VARCHAR(30),

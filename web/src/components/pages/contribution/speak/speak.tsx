@@ -103,7 +103,7 @@ const initialState: State = {
   isSubmitted: false,
   error: null,
   metadata: {
-    age: 18,
+    age: '',
     region: '',
     gender: '',
   },
@@ -602,7 +602,7 @@ class SpeakPage extends React.Component<Props, State> {
 
   private handleMetadataSubmit = (metadata: Metadata) => {
     const uc: UserClient = {
-      ageNum: metadata.age,
+      age: metadata.age,
       gender: metadata.gender,
       region: metadata.region,
     };
