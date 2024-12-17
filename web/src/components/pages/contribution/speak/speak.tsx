@@ -26,7 +26,7 @@ import { localeConnector, LocalePropsFromState } from '../../../locale-helpers';
 import Modal, { ModalButtons } from '../../../modal/modal';
 import TermsModal from '../../../terms-modal';
 import { CheckIcon, MicIcon, StopIcon, ReturnKeyIcon } from '../../../ui/icons';
-import { Button, TextButton, Spinner } from '../../../ui/ui';
+import { Button, LabeledTextArea, TextButton, Spinner } from '../../../ui/ui';
 import ContributionPage, {
   ContributionPillProps,
   SET_COUNT,
@@ -85,6 +85,7 @@ interface Props
 
 interface State {
   clips: SentenceRecording[];
+  comments: string[];
   isSubmitted: boolean;
   error?: RecordingError | AudioError;
   metadata: Metadata;
@@ -100,6 +101,7 @@ interface State {
 
 const initialState: State = {
   clips: [],
+  comments: [''],
   isSubmitted: false,
   error: null,
   metadata: {
@@ -315,6 +317,9 @@ class SpeakPage extends React.Component<Props, State> {
 
     if (isRecording) {
       this.saveRecording();
+      this.setState(prevState => ({
+        comments: [...prevState.comments, ''],
+      }));
       return;
     }
 
@@ -418,7 +423,7 @@ class SpeakPage extends React.Component<Props, State> {
     this.setState({ clips: [], isSubmitted: true });
 
     addUploads([
-      ...clips.map(({ sentence, recording }) => async () => {
+      ...clips.map(({ sentence, recording }, index) => async () => {
         let retries = 3;
         while (retries) {
           try {
@@ -427,7 +432,12 @@ class SpeakPage extends React.Component<Props, State> {
               hasEarnedSessionToast = false,
               showFirstStreakToast = false,
               challengeEnded = true,
-            } = await api.uploadClip(recording.blob, sentence.id, false);
+            } = await api.uploadClip(
+              recording.blob,
+              sentence.id,
+              this.state.comments[index],
+              false
+            );
             URL.revokeObjectURL(recording.url);
             try {
               sessionStorage.setItem(
@@ -501,7 +511,6 @@ class SpeakPage extends React.Component<Props, State> {
         );
       },
     ]);
-
     return true;
   };
 
@@ -610,6 +619,16 @@ class SpeakPage extends React.Component<Props, State> {
     this.setState({ metadata: metadata });
   };
 
+  private handleTextChange = (value: string) => {
+    const index = this.getRecordingIndex();
+    this.setState(prevState => ({
+      ...prevState,
+      comments: prevState.comments.map((comment, i) =>
+        i === index ? value : comment
+      ),
+    }));
+  };
+
   render() {
     const { getString, user, isLoading, hasLoadingError } = this.props;
     const {
@@ -715,6 +734,7 @@ class SpeakPage extends React.Component<Props, State> {
           <ContributionPage
             demoMode={false}
             activeIndex={recordingIndex}
+            commentValue={this.state.comments[this.getRecordingIndex()]}
             hasErrors={
               this.isUnsupportedPlatform ||
               (!isLoading && (hasLoadingError || isMissingClips))
@@ -770,6 +790,7 @@ class SpeakPage extends React.Component<Props, State> {
             isFirstSubmit={user.recordTally === 0}
             isPlaying={this.isRecording}
             isSubmitted={isSubmitted}
+            onCommentTextChange={this.handleTextChange}
             onMetadataButtonClicked={this.toggleMetadataModal}
             onReset={() => this.resetState()}
             onSkip={this.handleSkip}
@@ -824,31 +845,6 @@ class SpeakPage extends React.Component<Props, State> {
                   : clips[recordingIndex].sentence.id,
             }}
             sentences={clips.map(({ sentence }) => sentence)}
-            shortcuts={[
-              {
-                key: 'shortcut-record-toggle',
-                label: 'shortcut-record-toggle-label',
-                action: this.handleRecordClick,
-              },
-              {
-                key: 'shortcut-rerecord-toggle',
-                label: 'shortcut-rerecord-toggle-label',
-                action: this.handleRecordClick,
-              },
-              {
-                key: 'shortcut-discard-ongoing-recording',
-                label: 'shortcut-discard-ongoing-recording-label',
-                // This is handled in handleKeyUp, separately.
-                action: () => {},
-              },
-              {
-                key: 'shortcut-submit',
-                label: 'shortcut-submit-label',
-                icon: <ReturnKeyIcon />,
-                // This is handled in handleKeyUp, separately.
-                action: () => {},
-              },
-            ]}
             type="speak"
           />
         </div>

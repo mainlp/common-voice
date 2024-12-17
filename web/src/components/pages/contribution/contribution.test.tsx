@@ -92,7 +92,12 @@ const renderContributionPage = (
   overrideProps?: Partial<ContributionPageProps>
 ) =>
   renderWithProviders(
-    <ContributionPage {...defaultContributionPageProps} {...overrideProps} />
+    <ContributionPage
+      {...defaultContributionPageProps}
+      {...overrideProps}
+      commentValue=""
+      onCommentTextChange={() => console.log('test')}
+    />
   );
 
 describe('Contribution - Speak', () => {

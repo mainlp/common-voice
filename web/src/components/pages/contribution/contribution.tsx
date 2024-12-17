@@ -26,7 +26,13 @@ import {
   ArrowLeft,
   QuestionIcon,
 } from '../../ui/icons';
-import { Button, StyledLink, LabeledCheckbox, LinkButton } from '../../ui/ui';
+import {
+  Button,
+  StyledLink,
+  LabeledCheckbox,
+  LabeledTextArea,
+  LinkButton,
+} from '../../ui/ui';
 import { PrimaryButton } from '../../primary-buttons/primary-buttons';
 import ShareModal from '../../share-modal/share-modal';
 import { ReportButton, ReportModal, ReportModalProps } from './report/report';
@@ -65,6 +71,7 @@ export interface ContributionPageProps
     PropsFromDispatch {
   demoMode: boolean;
   activeIndex: number;
+  commentValue: string;
   hasErrors: boolean;
   errorContent?: React.ReactNode;
   reportModalProps: Omit<ReportModalProps, 'onSubmitted' | 'getString'>;
@@ -75,6 +82,7 @@ export interface ContributionPageProps
   isFirstSubmit?: boolean;
   isPlaying: boolean;
   isSubmitted: boolean;
+  onCommentTextChange: (e: string) => any;
   onMetadataButtonClicked?: () => void;
   onReset: () => any;
   onSkip: () => any;
@@ -86,12 +94,13 @@ export interface ContributionPageProps
   primaryButtons: React.ReactNode;
   pills: ((props: ContributionPillProps) => React.ReactNode)[];
   sentences: Sentence[];
+  /*
   shortcuts: {
     key: string;
     label: string;
     icon?: React.ReactNode;
     action: () => any;
-  }[];
+  }[];*/
   type: 'speak' | 'listen';
 }
 
@@ -145,6 +154,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
     return this.isLoaded && this.props.activeIndex === -1;
   }
 
+  /*
   private get shortcuts() {
     const { onSkip, shortcuts } = this.props;
     return shortcuts.concat({
@@ -152,7 +162,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
       label: 'skip',
       action: onSkip,
     });
-  }
+  }*/
 
   private startWaving = () => {
     const canvas = this.canvasRef.current;
@@ -177,6 +187,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
   private toggleShareModal = () =>
     this.setState({ showShareModal: !this.state.showShareModal });
 
+  /*
   private toggleShortcutsModal = () => {
     const showShortcutsModal = !this.state.showShortcutsModal;
     if (showShortcutsModal) {
@@ -187,7 +198,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
       );
     }
     return this.setState({ showShortcutsModal });
-  };
+  };*/
 
   private handleKeyDown = (event: any) => {
     const { getString, isSubmitted, locale, onReset, onSubmit, type } =
@@ -214,6 +225,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
       return;
     }
 
+    /* We do not use shortcuts, as they might interfere with user comments
     const shortcut = this.shortcuts.find(
       ({ key }) => getString(key).toLowerCase() === event.key
     );
@@ -224,7 +236,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
       'shortcut',
       locale
     );
-    event.preventDefault();
+    event.preventDefault();*/
   };
 
   render() {
@@ -248,6 +260,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
         {showShareModal && (
           <ShareModal onRequestClose={this.toggleShareModal} />
         )}
+        {/* We do not use shortcuts, as they might interfere with writing user comments
         {showShortcutsModal && (
           <Modal
             innerClassName="shortcuts-modal"
@@ -266,7 +279,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
               ))}
             </div>
           </Modal>
-        )}
+        )}*/}
         {showReportModal && (
           <ReportModal
             onRequestClose={() => this.setState({ showReportModal: false })}
@@ -298,11 +311,13 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
   renderContent() {
     const {
       activeIndex,
+      commentValue,
       hasErrors,
       errorContent,
       getString,
       instruction,
       isSubmitted,
+      onCommentTextChange,
       onMetadataButtonClicked,
       onReset,
       onSkip,
@@ -447,15 +462,59 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
             </div>
           )}
         </div>
-
+        {shouldShowCTA && this.isDone ? (
+          <div />
+        ) : (
+          <div className="tw-pt-4 tw-mt-4 tw-w-full tw-flex tw-flex-col tw-items-center tw-justify-center">
+            <div className="tw-w-full tw-max-w-xl">
+              <LabeledTextArea
+                label="Ihre Kommentare (Optional)"
+                rows={6}
+                style={{ resize: 'none' }}
+                value={commentValue}
+                onChange={(e: any) => onCommentTextChange(e.target.value)}
+              />
+              {type == 'listen' ? (
+                <div className="tw-mt-3">
+                  <span className="tw-italic">
+                    Klicken Sie auf das Playsymbol und beurteilen Sie, ob die
+                    Aufnahme den hochdeutschen Text korrekt wiedergibt und in
+                    einem bayrischen Dialekt gesprochen ist.{' '}
+                    <a
+                      href="/guidelines"
+                      target="_blank"
+                      className="tw-text-blue-600 tw-underline hover:tw-text-blue-800">
+                      Klicken Sie hier für eine Vollfassung der Richtlinien.
+                    </a>{' '}
+                    Optional können Sie einen Kommentar zu der Aufnahme
+                    hinterlassen, wenn Sie mehr Details zu Ihrer Entscheidung
+                    angeben möchten.
+                  </span>
+                </div>
+              ) : (
+                <div className="tw-mt-3">
+                  <span className="tw-italic">
+                    Überlegen Sie sich, wie Sie den Satz in bayrischem Dialekt
+                    formulieren würden. Klicken Sie dann auf das Mikrofon-Symbol
+                    und sprechen Sie den Satz in Ihrer Formulierung.{' '}
+                    <a
+                      href="/guidelines"
+                      target="_blank"
+                      className="tw-text-blue-600 tw-underline hover:tw-text-blue-800">
+                      Klicken Sie hier für eine Vollfassung der Richtlinien.
+                    </a>{' '}
+                    Optional können Sie einen Kommentar zu dem Satz
+                    hinterlassen, wenn Sie mehr Details zu Ihrer Aufnahme
+                    angeben möchten.
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
         {noUserAccount && shouldShowSecondCTA && (
           <SecondPostSubmissionCTA onReset={onReset} />
         )}
-
-        {instruction({
-          vars: { actionType: getString('action-tap') },
-          children: <div className="instruction hidden-md-up" />,
-        }) || <div className="instruction hidden-md-up" />}
 
         <div className="primary-buttons">
           <canvas ref={this.canvasRef} />
@@ -500,15 +559,6 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
                   onClick={() => this.setState({ showReportModal: true })}
                 />
               )}
-              <Tooltip title="Shortcuts" arrow>
-                <Button
-                  rounded
-                  outline
-                  className="hidden-md-down shortcuts-btn"
-                  onClick={this.toggleShortcutsModal}>
-                  <KeyboardIcon />
-                </Button>
-              </Tooltip>
             </div>
           </div>
           <div>

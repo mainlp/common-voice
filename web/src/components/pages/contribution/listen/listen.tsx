@@ -84,6 +84,7 @@ interface Props
 
 interface State {
   clips: (ClipType & { isValid?: boolean })[];
+  comment: string;
   hasPlayed: boolean;
   hasPlayedSome: boolean;
   isPlaying: boolean;
@@ -92,6 +93,7 @@ interface State {
 
 const initialState: State = {
   clips: [],
+  comment: '',
   hasPlayed: false,
   hasPlayedSome: false,
   isPlaying: false,
@@ -162,7 +164,7 @@ class ListenPage extends React.Component<Props, State> {
     trackListening('listen', this.props.locale);
   };
 
-  private vote = (isValid: boolean) => {
+  private vote = (isValid: boolean, comment: string) => {
     const { clips } = this.state;
 
     const {
@@ -176,7 +178,7 @@ class ListenPage extends React.Component<Props, State> {
     const clipIndex = this.getClipIndex();
 
     this.stop();
-    this.props.vote(isValid, this.state.clips[this.getClipIndex()].id);
+    this.props.vote(isValid, comment, this.state.clips[this.getClipIndex()].id);
 
     try {
       sessionStorage.setItem('challengeEnded', JSON.stringify(challengeEnded));
@@ -215,6 +217,7 @@ class ListenPage extends React.Component<Props, State> {
       api.setInviteContributeAchievement();
     }
     this.setState({
+      comment: '',
       hasPlayed: false,
       hasPlayedSome: false,
       isPlaying: false,
@@ -229,7 +232,7 @@ class ListenPage extends React.Component<Props, State> {
     if (!this.state.hasPlayed) {
       return;
     }
-    this.vote(true);
+    this.vote(true, this.state.comment);
     trackListening('vote-yes', this.props.locale);
   };
 
@@ -238,7 +241,7 @@ class ListenPage extends React.Component<Props, State> {
     if (!hasPlayed && !hasPlayedSome) {
       return;
     }
-    this.vote(false);
+    this.vote(false, this.state.comment);
     trackListening('vote-no', this.props.locale);
   };
 
@@ -291,6 +294,13 @@ class ListenPage extends React.Component<Props, State> {
     onConfirm();
     this.props.setAbortStatus(AbortContributionModalStatus.CONFIRMED);
     this.setAbortContributionModalVisiblity(false);
+  };
+
+  private handleTextChange = (value: string) => {
+    this.setState(prevState => ({
+      ...prevState,
+      comment: value,
+    }));
   };
 
   render() {
@@ -360,6 +370,7 @@ class ListenPage extends React.Component<Props, State> {
             activeIndex={clipIndex}
             demoMode={false}
             hasErrors={!isLoading && (isMissingClips || hasLoadingError)}
+            commentValue={this.state.comment}
             errorContent={
               <ListenErrorContent
                 isLoading={isLoading}
@@ -390,6 +401,7 @@ class ListenPage extends React.Component<Props, State> {
             }
             isPlaying={isPlaying}
             isSubmitted={isSubmitted}
+            onCommentTextChange={this.handleTextChange}
             onReset={this.reset}
             onSkip={this.handleSkip}
             primaryButtons={
@@ -450,23 +462,6 @@ class ListenPage extends React.Component<Props, State> {
               id: activeClip ? activeClip.id : null,
             }}
             sentences={clips.map(clip => clip.sentence)}
-            shortcuts={[
-              {
-                key: 'shortcut-play-toggle',
-                label: 'shortcut-play-toggle-label',
-                action: this.play,
-              },
-              {
-                key: 'shortcut-vote-yes',
-                label: 'vote-yes',
-                action: this.voteYes,
-              },
-              {
-                key: 'shortcut-vote-no',
-                label: 'vote-no',
-                action: this.voteNo,
-              },
-            ]}
             type="listen"
           />
         </div>

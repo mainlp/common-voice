@@ -15,7 +15,7 @@ import { ChallengeToken, challengeTokens } from 'common';
 import validate from './validation';
 import { clipsSchema } from './validation/clips';
 import { pipe } from 'fp-ts/lib/function';
-import { option as O, taskEither as TE, task as T, identity as Id } from 'fp-ts';
+import { option as O, taskEither as TE, task as T, identity as Id, comonad } from 'fp-ts';
 import { Clip as ClientClip } from 'common';
 import { FindVariantsBySentenceIdsResult, findVariantsBySentenceIdsInDb } from '../application/sentences/repository/variant-repository';
 
@@ -74,6 +74,7 @@ export default class Clip {
     );
 
     router.post('/:clipId/votes', this.saveClipVote);
+    router.post('/:clipId/comment', this.saveComment);
     router.post('*', this.saveClip);
 
     router.get('/daily_count', this.serveDailyCount);
@@ -124,7 +125,7 @@ export default class Clip {
     response: Response
   ) => {
     const id = params.clipId as string;
-    const { isValid, challenge } = body;
+    const { isValid, comment, challenge } = body;
 
     if (!id || !client_id) {
       this.clipSaveError(
@@ -153,7 +154,7 @@ export default class Clip {
 
     const glob = clip.path.replace('.mp3', '');
 
-    await this.model.db.saveVote(id, client_id, isValid);
+    await this.model.db.saveVote(id, client_id, isValid, comment);
     await Awards.checkProgress(client_id, { id: clip.locale_id });
     await checkGoalsAfterContribution(client_id, { id: clip.locale_id });
     // move it to the last line and leave a trace here in case of serious performance issues
@@ -358,6 +359,44 @@ export default class Clip {
           'clip'
         );
       });
+    }
+  };
+
+  saveComment = async (request: Request, response: Response) => {
+    const { client_id, headers, body } = request;
+    const sentenceId = headers.sentence_id as string;
+    if (!sentenceId || !client_id) {
+      this.clipSaveError(
+        headers,
+        response,
+        400,
+        `missing parameter: ${sentenceId ? 'client_id' : 'clip_id'}`,
+        ERRORS.MISSING_PARAM,
+        'clip'
+      );
+      return;
+    }
+
+    const sentence = await this.model.db.findSentence(sentenceId);
+    if (!sentence) {
+      this.clipSaveError(
+        headers,
+        response,
+        422,
+        `clip not found`,
+        ERRORS.CLIP_NOT_FOUND,
+        'clip'
+      );
+      return;
+    }
+    try{
+      const result = await this.model.db.saveClipComment(sentenceId, client_id, body.comment);
+      console.log(result)
+      response.json({ success: result });
+    }
+    catch (error) {
+      console.error("Error in saveComment:", error);
+      response.status(500).json({ error: 'Failed to save comment' });
     }
   };
 

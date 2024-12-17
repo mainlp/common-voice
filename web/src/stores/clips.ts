@@ -149,7 +149,7 @@ export namespace Clips {
       },
 
     vote:
-      (isValid: boolean, clipId?: string) =>
+      (isValid: boolean, comment: string, clipId?: string) =>
       async (
         dispatch: Dispatch<Action | User.Action>,
         getState: () => StateTree
@@ -163,7 +163,7 @@ export namespace Clips {
           hasEarnedSessionToast,
           showFirstStreakToast,
           challengeEnded,
-        } = await state.api.saveVote(id, isValid);
+        } = await state.api.saveVote(id, isValid, comment);
         if (!state.user.account) {
           dispatch(User.actions.tallyVerification());
         }

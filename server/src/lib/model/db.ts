@@ -702,14 +702,14 @@ export default class DB {
     );
   }
 
-  async saveVote(id: string, client_id: string, is_valid: string) {
+  async saveVote(id: string, client_id: string, is_valid: string, comment: string) {
     await this.createOrVerifyUserClient(client_id);
     await this.mysql.query(
       `
-      INSERT INTO votes (clip_id, client_id, is_valid) VALUES (?, ?, ?)
+      INSERT INTO votes (clip_id, client_id, is_valid, comment) VALUES (?, ?, ?, ?)
       ON DUPLICATE KEY UPDATE is_valid = VALUES(is_valid)
     `,
-      [id, client_id, is_valid ? 1 : 0]
+      [id, client_id, is_valid ? 1 : 0, comment]
     );
 
     await this.mysql.query(
@@ -766,6 +766,19 @@ export default class DB {
           WHERE id = ?`,
       [id, id]
     );
+  }
+
+  async saveClipComment(sentence_id: string, client_id: string, comment: string) {
+    const [result] = await this.mysql.query(
+      `
+      UPDATE clips 
+      SET comment = ?
+      WHERE original_sentence_id = ? AND client_id = ?
+      `,
+      [comment, sentence_id, client_id]
+    );
+    
+    return result.affectedRows > 0;
   }
 
   async saveClip({

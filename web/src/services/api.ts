@@ -130,9 +130,10 @@ export default class API {
     return this.fetch(`${this.getClipPath()}?count=${count}`)
   }
 
-  uploadClip(
+  async uploadClip(
     blob: Blob,
     sentenceId: string,
+    comment: string,
     fromDemo?: boolean
   ): Promise<{
     showFirstContributionToast?: boolean
@@ -141,7 +142,7 @@ export default class API {
     challengeEnded: boolean
   }> {
     // make sure nginx server has allow_underscore turned on
-    return this.fetch(this.getClipPath(), {
+    const audioResult = await this.fetch(this.getClipPath(), {
       method: 'POST',
       headers: {
         'Content-Type': blob.type,
@@ -151,13 +152,32 @@ export default class API {
         source: 'web',
       },
       body: blob,
-    })
+    });
+    
+    if (comment) {
+      try {
+        await this.fetch(`${this.getClipPath()}/${sentenceId}/comment`, {
+          method: 'POST',
+          headers: {
+            sentence_id: sentenceId,
+          },
+          body: {
+            comment,
+          },
+        });
+      } catch (error) {
+        console.error("Error saving comment:", error);
+      }
+    }
+    return audioResult;
   }
-  saveVote(id: string, isValid: boolean): Promise<Vote> {
+
+  saveVote(id: string, isValid: boolean, comment: string): Promise<Vote> {
     return this.fetch(`${this.getClipPath()}/${id}/votes`, {
       method: 'POST',
       body: {
         isValid,
+        comment,
         challenge: getChallenge(this.user),
       },
     })
