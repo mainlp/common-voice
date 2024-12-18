@@ -5,14 +5,17 @@ import {
 } from '@fluent/react';
 import * as React from 'react';
 import { useEffect, useRef, useState } from 'react';
+import Confetti from 'react-confetti';
 import { DAILY_GOALS } from '../../../constants';
 import { useAccount, useAPI } from '../../../hooks/store-hooks';
+import useWindowSize from '../../../hooks/use-window-size';
 import URLS from '../../../urls';
 import { LocaleLink, useLocale } from '../../locale-helpers';
 import { CheckIcon, MicIcon, PlayOutlineIcon } from '../../ui/icons';
 import { Button, LinkButton, TextButton } from '../../ui/ui';
 import { SET_COUNT } from './contribution';
 import { getTrackClass } from '../../../services/tracker';
+import happyMarsImage from '../../../../img/happy-mars@2x.png';
 
 import './success.css';
 
@@ -43,6 +46,14 @@ function Success({
   const account = useAccount();
 
   const [locale, toLocaleRoute] = useLocale();
+  const { height, width } = useWindowSize();
+  const confettiSourceObject = {
+    w: 10,
+    h: 10,
+    x: width / 2,
+    y: height / 4,
+  };
+  const heightWithoutHeader = height - 75;
 
   const hasAccount = Boolean(account);
   const customGoal =
@@ -118,6 +129,23 @@ function Success({
 
   return (
     <div className="contribution-success" data-testid="contribution-success">
+      <Confetti
+        width={width}
+        height={heightWithoutHeader}
+        numberOfPieces={200}
+        gravity={0.1}
+        recycle={false}
+        initialVelocityX={8}
+        initialVelocityY={14}
+        opacity={70}
+        confettiSource={confettiSourceObject}
+        tweenDuration={7000}
+      />
+      <div className="tw-flex tw-justify-center tw-items-center">
+        <div className="tw-mb-6" data-testid="happy-mars">
+          <img src={happyMarsImage} alt="Happy Mars" width={175} height={175} />
+        </div>
+      </div>
       <div className="counter done">
         <CheckIcon />
         <Localized
@@ -145,6 +173,7 @@ function Success({
       </div>
 
       {hasAccount ? (
+        <div></div> /* For now we do not use custom goals
         !customGoal && (
           <div className="info-card">
             <Localized
@@ -160,7 +189,7 @@ function Success({
               />
             </Localized>
           </div>
-        )
+        )*/
       ) : (
         <div className="info-card">
           <Localized id="profile-explanation">

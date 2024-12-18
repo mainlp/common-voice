@@ -143,10 +143,10 @@ class ListenPage extends React.Component<Props, State> {
     this.audioRef.current.play();
     this.setState({ isPlaying: true });
     clearInterval(this.playedSomeInterval);
-    this.playedSomeInterval = setInterval(
+    /*this.playedSomeInterval = setInterval(
       () => this.setState({ hasPlayedSome: true }),
       VOTE_NO_PLAY_MS
-    );
+    );*/
   };
 
   private stop = () => {
@@ -155,7 +155,7 @@ class ListenPage extends React.Component<Props, State> {
       audio.pause();
       audio.currentTime = 0;
       clearInterval(this.playedSomeInterval);
-      this.setState({ isPlaying: false });
+      this.setState({ isPlaying: false, hasPlayedSome: true });
     }
   };
 

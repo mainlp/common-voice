@@ -799,8 +799,6 @@ class SpeakPage extends React.Component<Props, State> {
               this.onPrivacyAgreedChange(privacyAgreed)
             }
             privacyAgreedChecked={this.state.privacyAgreedChecked}
-            shouldShowFirstCTA={this.state.shouldShowFirstCTA}
-            shouldShowSecondCTA={this.state.shouldShowSecondCTA}
             primaryButtons={
               <RecordButton
                 trackClass="speak-record"

@@ -336,7 +336,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
 
     const noUserAccount = !user.account;
 
-    if (isSubmitted && type === 'listen' && noUserAccount) {
+    if (isSubmitted) {
       return <Success onReset={onReset} type={type} />;
     }
 
@@ -462,7 +462,7 @@ class ContributionPage extends React.Component<ContributionPageProps, State> {
             </div>
           )}
         </div>
-        {shouldShowCTA && this.isDone ? (
+        {this.isDone ? (
           <div />
         ) : (
           <div className="tw-pt-4 tw-mt-4 tw-w-full tw-flex tw-flex-col tw-items-center tw-justify-center">
