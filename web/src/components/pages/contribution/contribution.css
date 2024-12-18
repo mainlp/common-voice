@@ -14,15 +14,16 @@
 }
 
 .contribution {
-    position: absolute;
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     overflow-x: hidden;
     margin: 0 auto;
-    padding: 10px 20px;
+    padding: 10px 5vw;
     max-width: var(--wide-desktop-width);
     width: 100%;
+    min-width: 0;
     height: calc(100% - var(--header-height));
 
     @media (--tall) {
@@ -37,7 +38,7 @@
     }
 
     @media (--sm-down) {
-        padding-bottom: 20px;
+        padding-bottom: 80px;
     }
 
     .button {
