@@ -140,6 +140,10 @@ module.exports = (_env, argv) => {
     module: {
       rules: [
         {
+          test: /\.md$/,
+          type: 'asset/source'
+        },
+        {
           test: /\.(ts|tsx)$/,
           exclude: /node_modules/,
           use: [

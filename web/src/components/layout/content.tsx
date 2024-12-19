@@ -9,6 +9,8 @@ import { Spinner } from '../ui/ui';
 import { LoginFailure, LoginSuccess } from '../pages/login';
 const HomePage = React.lazy(() => import('../pages/home/home'));
 
+const PrivacyPage = React.lazy(() => import('../pages/privacy/privacy'));
+const TermsPage = React.lazy(() => import('../pages/terms/terms'));
 const DashboardPage = React.lazy(() => import('../pages/dashboard/dashboard'));
 const ProfileLayoutPage = React.lazy(() => import('../pages/profile/layout'));
 const AboutPage = React.lazy(() => import('../pages/about/about'));
@@ -49,11 +51,12 @@ export default function Content({ location }: { location: any }) {
             />
           )}
         />
+        {/*
         <SentryRoute
           exact
           path={toLocaleRoute(URLS.DATA)}
           render={() => <Redirect to={toLocaleRoute(URLS.DATASETS)} />}
-        />
+        />*/}
         <SentryRoute
           exact
           path={toLocaleRoute('/login-failure')}
@@ -111,17 +114,12 @@ export default function Content({ location }: { location: any }) {
         <SentryRoute
           exact
           path={toLocaleRoute(URLS.PRIVACY)}
-          render={() => <DocumentPage key="p" name="privacy" />}
+          component={PrivacyPage}
         />
         <SentryRoute
           exact
           path={toLocaleRoute(URLS.TERMS)}
-          render={() => <DocumentPage key="t" name="terms" />}
-        />
-        <SentryRoute
-          exact
-          path={toLocaleRoute(URLS.CHALLENGE_TERMS)}
-          render={() => <DocumentPage key="c" name="challenge-terms" />}
+          component={TermsPage}
         />
         <SentryRoute
           path={toLocaleRoute('/404')}
@@ -153,6 +151,7 @@ export default function Content({ location }: { location: any }) {
             return <Redirect to={toLocaleRoute(URLS.LISTEN)} />;
           }}
         />
+        {/*
         <SentryRoute
           exact
           path={toLocaleRoute(URLS.WRITE)}
@@ -161,7 +160,7 @@ export default function Content({ location }: { location: any }) {
             // locale changing edge cases where toLocaleRoute is still using the old locale
             return <Redirect to={toLocaleRoute(URLS.WRITE)} />;
           }}
-        />
+        />*/}
         <SentryRoute
           exact
           path={toLocaleRoute(URLS.GUIDELINES)}
