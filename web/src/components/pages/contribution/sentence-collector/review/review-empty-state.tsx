@@ -1,9 +1,9 @@
-import { Localized } from '@fluent/react'
-import * as React from 'react'
+import { Localized } from '@fluent/react';
+import * as React from 'react';
 
-import { LinkButton } from '../../../../ui/ui'
-import { ArrowRight } from '../../../../ui/icons'
-import URLS from '../../../../../urls'
+import { LinkButton } from '../../../../ui/ui';
+import { ArrowRight } from '../../../../ui/icons';
+import URLS from '../../../../../urls';
 
 const ReviewEmptyState = () => {
   return (
@@ -12,15 +12,9 @@ const ReviewEmptyState = () => {
         <h1>
           <Localized id="sc-review-empty-state" />
         </h1>
-        <LinkButton rounded blank to={URLS.WRITE}>
-          <ArrowRight className="speak-sc-icon" />{' '}
-          <Localized id="speak-empty-state-cta">
-            <span />
-          </Localized>
-        </LinkButton>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ReviewEmptyState
+export default ReviewEmptyState;

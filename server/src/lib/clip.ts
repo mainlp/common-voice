@@ -222,10 +222,28 @@ export default class Clip {
     }
 
     // Where is our audio clip going to be located?
+    const folder = client_id + '/';
     const filePrefix = sentenceId;
-    const clipFileName = filePrefix + '.mp3';
+    const clipFileName = folder + filePrefix + '.mp3';
     const metadata = `${clipFileName} (${size} bytes, ${format}) from ${source}`;
+    const userDir = join(AUDIO_WRITE_LOCATION, folder);
     const clipLocation = join(AUDIO_WRITE_LOCATION, clipFileName);
+
+    // Create user directory if it doesn't exist
+    try {
+      await fs.promises.mkdir(userDir, { recursive: true });
+    } catch (err) {
+      console.error('Error creating directory:', err);
+      this.clipSaveError(
+        headers,
+        response,
+        500,
+        `Error creating directory: ${err.message}`,
+        ERRORS.FILE_SAVE_ERROR,
+        'clip'
+      );
+      return;
+    }
 
     if (await this.model.db.clipExists(client_id, sentenceId)) {
       this.clipSaveError(

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Localized } from '@fluent/react';
-import URLS from '../../../../urls'
+import URLS from '../../../../urls';
 
 import {
   ArrowRight,
@@ -58,14 +58,6 @@ const NoSentencesAvailable = () => (
       <h1>
         <Localized id="speak-empty-state" />
       </h1>
-      <LinkButton
-        rounded
-        to={URLS.WRITE}>
-        <ArrowRight className="speak-sc-icon" />{' '}
-        <Localized id="speak-empty-state-cta">
-          <span />
-        </Localized>
-      </LinkButton>
     </div>
   </div>
 );
