@@ -1,71 +1,21 @@
 # Common Voice
 
-This is the web app for [Mozilla Common Voice](https://commonvoice.mozilla.org), a platform for collecting speech donations in order to create public domain datasets for training voice recognition-related tools.
+This project is a fork of the [Common Voice project](https://github.com/common-voice/common-voice) for collecting spoken dialect data.
 
-## Upcoming releases
+### Setup
+ - clone the repo
+ - install [Docker](https://docs.docker.com/engine/install/) and docker compose
+ - start the Docker engine
+ - cd to the repo root and run ```docker compose up web``` (this will take quite some time when run the first time)
 
-| Type             | Release Cadence  | More info      |
-| :--------------- |:---------------|:---------------|
-| Platform code & sentences | Monthly, or as needed | [Release notes](https://github.com/common-voice/common-voice/releases) |
-| Dataset          | Quarterly | [Dataset metadata](https://github.com/common-voice/cv-dataset/) |
-
-## Quick links
-
-- [Code of conduct](./docs/CODE_OF_CONDUCT.md)
-- [Development setup](./docs/DEVELOPMENT.md)
-- [Language workflow](./docs/LANGUAGE.md)
-- [Sentences workflow](./docs/SENTENCES.md)
-- [Discourse forum](https://discourse.mozilla-community.org/c/voice)
-- [Matrix chat](https://chat.mozilla.org/#/room/#common-voice:mozilla.org)
-- [License](./LICENSE)
-
-## How to contribute
-
-🎉 First off, thanks for taking the time to contribute! This project would not be possible without people like you. 🎉
-
-There are many ways to get involved with Common Voice - you don't have to know how to code to contribute!
-
-- To add or correct the translation of the web interface, please use the [Mozilla localization platform Pontoon](https://pontoon.mozilla.org/projects/common-voice/). Please note, we do **not** accept any direct pull requests for changing localization content.
-- For information on how to add or edit sentences to Common Voice, see [SENTENCES.md](./docs/SENTENCES.md)
-- For instructions on setting up a local development environment, see [DEVELOPMENT.md](./docs/DEVELOPMENT.md)
-- For information on how to add a new language to Common Voice, see [LANGUAGE.md](./docs/LANGUAGE.md)
-- For information on how to get in contact with existing language communities, see [COMMUNITIES.md](./docs/COMMUNITIES.md)
-
-For more general guidance on building your own language community using Mozilla voice tools, please refer to the [Mozilla Voice Community Playbook](https://common-voice.github.io/community-playbook/).
-
-## Discussion
-
-For general discussion (feedback, ideas, random musings), head to our [Discourse Category](https://discourse.mozilla-community.org/c/voice).
-
-For bug reports or specific feature, please use the [GitHub issue tracker](https://github.com/mozilla/common-voice/issues).
-
-For live chat, [join us on Matrix](https://chat.mozilla.org/#/room/#common-voice:mozilla.org).
-
-## Licensing and content source
-
-This repository is released under [MPL (Mozilla Public License) 2.0](LICENSE).
-
-The majority of our sentence text in `/server/data` comes directly from user submissions in our [Sentence Collector](https://github.com/Common-Voice/sentence-collector/) or they are scraped from Wikipedia using our [extractor tool](https://github.com/Common-Voice/cv-sentence-extractor), and are released under a [CC0 public domain Creative Commons license](https://creativecommons.org/share-your-work/public-domain/cc0/).
-
-Any files that follow the pattern `europarl-VERSION-LANG.txt` (such as [europarl-v7-de.txt](https://github.com/mozilla/common-voice/blob/main/server/data/de/europarl-v7-de.txt)) were extracted with our thanks from the [Europarl Corpus](http://www.statmt.org/europarl/), which features transcripts from proceedings in the European parliament.
-
-## Citation
-
-If you use the data in a published academic work we would appreciate if you cite the following article:
-
-- Ardila, R., Branson, M., Davis, K., Henretty, M., Kohler, M., Meyer, J., Morais, R., Saunders, L., Tyers, F. M. and Weber, G. (2020) "[Common Voice: A Massively-Multilingual Speech Corpus](https://arxiv.org/abs/1912.06670)". _Proceedings of the 12th Conference on Language Resources and Evaluation (LREC 2020)._ pp. 4211—4215
-
-The BiBTex is:
-
-```
-@inproceedings{commonvoice:2020,
-  author = {Ardila, R. and Branson, M. and Davis, K. and Henretty, M. and Kohler, M. and Meyer, J. and Morais, R. and Saunders, L. and Tyers, F. M. and Weber, G.},
-  title = {Common Voice: A Massively-Multilingual Speech Corpus},
-  booktitle = {Proceedings of the 12th Conference on Language Resources and Evaluation (LREC 2020)},
-  pages = {4211--4215},
-  year = 2020
-}
-```
-
-## Cross Browser Testing
-This project is tested with [Browserstack](https://email.browserstack.com/c/eJwkyrGSgyAQANCv0Q5nQQUsKK7Jb9ws7BKZoCSA40y-_orrH7nVr2RGdlLbWSsLVo2789pu2kgPwISB_AwbgJUWMEYdDIzJ6WVFBbNUKxr5K1kqDAa9UhyD3TZjaZ1aIn6lj4iVPxefXUQS70JXY2xdigPTOQufLxZ6IR8tea3Fs7_8d1iAD0x5ipXbTtxeUyjHmN3e-3uYfwb1GNTjvu_J13I3rq1j-DfVHSnsnDNfwwJH-aacMZbrJOypnFOpz78AAAD__4I2T84)
+(Tested on a Windows machine with Docker engine running, and docker compose from WSL instance)
+### Working with the code
+  - Backend code is located under ```/server```
+  - Frontend code is located under ```/web```
+  - ...
+### TODOs
+  - check security settings for deployment on a live server! ```docker-compose.yaml``` currently contains the database passwords. This is fine for local deployment, but on a live server we need to move this to some env file that is not uploaded to GitHub
+  - adjust ```.env-local-docker``` for deployment on live server
+  - Supertokens currently works only for local deployment. Needs to be adjusted for deployment on live server
+  - Test the full workflow of speaking/listening on the live server
+  - The live server requires tls certificates (so it runs on https instead of http). Otherwise, browsers do not allow access to microphone. Certificates need to be updated from time to time
